@@ -1,15 +1,18 @@
 import socket
 
 from threading import Thread
+
+from distlib.compat import raw_input
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = "82.157.185.215"
 localhost = "127.0.0.1"
-sock.connect((localhost, 12345))
+sock.connect((host, 12345))
 
 def send_msg(sock, msg):
     while True:
-        msg = input("Enter your message: ")
-        sock.send(msg, "utf8")
+        msg = raw_input()
+        sock.send(bytes(msg, "utf8"))
         if msg == "{quit}":
             sock.close()
             break
@@ -21,8 +24,8 @@ def recv_msg(sock):
         except OSError:
             break
 if __name__== '__main__':
-    print("Connected to server")
-    nikename = input("Enter your nikename: ")
-    sock.send(nikename)
+    print("Connected to server,type'{quit}' to exit")
+    nikename = raw_input("Enter your nikename: ")
+    sock.send(bytes(nikename, "utf8"))
     Thread(target=send_msg, args=(sock, nikename)).start()
     Thread(target=recv_msg, args=(sock,)).start()
