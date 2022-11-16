@@ -1,4 +1,43 @@
-# chatroom
-简单用python实现一个聊天室，权当练习
+# Chat room
 
-或许以后会升级成c++程序
+[![license](https://img.shields.io/github/license/Lambert-Rao/chatroom?style=plastic)](LICENSE)
+
+[![code size ](https://img.shields.io/github/languages/code-size/Lambert-Rao/chatroom?style=plastic)]()
+
+A simple client-server chat room project.
+
+## Background
+
+I'm learning socket program, so I make this as a practice.
+
+## Install
+
+```shell
+#get all resources 
+wget https://github.com/Lambert-Rao/chatroom.git
+#or install from release 
+```
+
+## Usage
+
+```shell
+#for client
+python3 client.py
+#or use the packaged executable file
+```
+
+
+```shell
+#for server 
+#download the server directory 
+cd cmake & cmake .. & make
+./server ${your_port}
+```
+
+## Contributing
+
+issues and PRs accepted.
+
+## License
+
+[MIT © Richard McRichface.](./LICENSE)
