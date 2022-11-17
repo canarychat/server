@@ -6,6 +6,8 @@
 
 A simple client-server chat room project.
 
+[toc]
+
 ## Background
 
 I'm learning socket program, so I make this as a practice.
@@ -16,6 +18,9 @@ I'm learning socket program, so I make this as a practice.
 #get all resources 
 wget https://github.com/Lambert-Rao/chatroom.git
 #or install from release 
+
+#sometimes you need to install the tk
+sudo pacman -S tk
 ```
 
 ## Usage
