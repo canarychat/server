@@ -69,7 +69,6 @@ class text_interface:
         self.text.grid(row=2, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self.board.grid(row=3, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self.send.grid(row=4, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
-
     def button_send_msg(self):
         if (status[0] == 1):
             me.showerror(title="错误", message="未连接服务器")
@@ -114,6 +113,8 @@ class chat:
     def listen(self):
         while (True):
             msg = sock.recv(1024).decode('ascii')
+            if (msg == '\\SYNACK'):
+                status[0] = 0
             print(msg)
             T.text.insert(1.0, msg)
 class switch:
@@ -227,9 +228,11 @@ def restart_program():
 # 界面
 root = tk.Tk()
 I = init_interface()
+
 T = text_interface()
-S = switch()
 C = chat()
+S = switch()
+
 
 if __name__ == '__main__':
     status = [1, 1]
@@ -239,13 +242,15 @@ if __name__ == '__main__':
     port = tk.IntVar()
     host.set(get_host())
     port.set(get_port())
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((host.get(), port.get()))
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((host.get(), port.get()))
+    except:
+        me.showwarning("警告", "连接服务器失败", parent=root)
     getconnect()
 
     forget()
-    C.refresh_text()
+
 
     root.mainloop()
 
