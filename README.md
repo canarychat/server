@@ -1,12 +1,10 @@
 # Chat room
 
-[![license](https://img.shields.io/github/license/Lambert-Rao/chatroom?style=plastic)](LICENSE)
-
-[![code size ](https://img.shields.io/github/languages/code-size/Lambert-Rao/chatroom?style=plastic)]()
+[![license](https://img.shields.io/github/license/Lambert-Rao/chatroom?style=plastic)](LICENSE)[![code size](https://img.shields.io/github/languages/code-size/Lambert-Rao/chatroom?style=plastic)]()[![platform](https://img.shields.io/badge/platform-Linux-yellow?style=plastic)](https://en.wikipedia.org/wiki/Linux)
 
 A simple client-server chat room project.
 
-[toc]
+> warning! may not work on windows platform
 
 ## Background
 
