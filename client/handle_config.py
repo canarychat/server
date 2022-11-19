@@ -2,10 +2,16 @@ import json
 
 
 def load_config():
-    file_object = open("config.json", "r")
-    config = json.loads(file_object.read())
-    file_object.close()
-    return config
+    try:
+        file_object = open("config.json", "r")
+        config = json.loads(file_object.read())
+        file_object.close()
+        return config
+    except:
+        file_object = open("config.json", "w")
+        config = {"usr": {"id": "", "name": ""}, "server": {"host": "0.0.0.0", "port": "12345"}}
+        file_object.write(json.dumps(config))
+        return config
 def save_config(config):
     file_object = open("config.json", "w")
     file_object.write(json.dumps(config))

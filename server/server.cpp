@@ -7,6 +7,7 @@
 #include <vector>
 #include <unistd.h>
 #include <functional>
+#include <algorithm>
 
 constexpr int BUFFER_SIZE = 1024;
 constexpr int EVENT_SIZE = 128;
@@ -44,8 +45,6 @@ void broad_cast(reactor &r, char *buf, int len)
 {
     for (auto &sock: r.socks)
     {
-//        if (sock.event.data.fd == -1)
-//            continue;
         memcpy(sock.wbuf, buf, len);
         auto ev = sock.event;
         ev.events |= EPOLLOUT;

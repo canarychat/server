@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import time
 import tkinter as tk
 import tkinter.messagebox as me
 import socket
@@ -29,23 +30,14 @@ def test(h, p):
     port.set(p)
     try:
         sock.send(bytes('\\SYN', "ascii"))
-        result = sock.recv(1024)
-        if '\\SYNACK' in result.decode('ascii'):
-            return True
     except:
         return False
-def getconnect():
+def connect():
     try:
-        if (test(host.get(), port.get())):
-            status[0] = 0
-        else:
-            host.set("未连接服务器")
-            status[0] = 1
+        sock.close()
     except:
-        me.showerror("错误", "连接失败")
-        status[0] = 1
-    finally:
-        refresh_menu()
+        pass
+    restart_program()
 def disconnect():
     sock.close()
     status[0] = 1
@@ -113,10 +105,9 @@ class chat:
     def listen(self):
         while (True):
             msg = sock.recv(1024).decode('ascii')
-            if (msg == '\\SYNACK'):
-                status[0] = 0
             print(msg)
             T.text.insert(1.0, msg)
+            time.sleep(0.1)
 class switch:
     def __init__(self):
         I.forget()
@@ -172,7 +163,7 @@ def refresh_menu():
 
     servermenu = tk.Menu(main_menu, tearoff=0)
     servermenu.add_command(label=host.get(), font=("黑体", 12))
-    servermenu.add_command(label="连接", font=("黑体", 12), command=restart_program)
+    servermenu.add_command(label="连接", font=("黑体", 12), command=connect)
     servermenu.add_command(label="断开", font=("黑体", 12), command=disconnect)
     servermenu.add_command(label="切换", font=("黑体", 12), command=S.__init__)
     main_menu.add_cascade(label="服务器", menu=servermenu, font=("黑体", 12))
@@ -196,13 +187,13 @@ def logout():
 class change_name():
     def __init__(self):
         forget()
-        self.server_frame = tk.Frame(root, width=400, height=300, bg="light blue")
-        self.server_frame.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
-        text01 = tk.Label(self.server_frame, text="新昵称", bg="green", font=("黑体", 12))
+        self.frame = tk.Frame(root, width=400, height=300, bg="light blue")
+        self.frame.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+        text01 = tk.Label(self.frame, text="新昵称", bg="green", font=("黑体", 12))
         text01.grid(row=2, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
-        self.newname = tk.Text(self.server_frame, width=20, height=1, bg='white', font=("黑体", 12))
+        self.newname = tk.Text(self.frame, width=20, height=1, bg='white', font=("黑体", 12))
         self.newname.grid(row=2, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
-        accept = tk.Button(self.server_frame, text="确定", font=("黑体", 12), command=self.get)
+        accept = tk.Button(self.frame, text="确定", font=("黑体", 12), command=self.get)
         accept.grid(row=5, column=3, sticky=tk.N + tk.S + tk.E + tk.W)
 
     def get(self):
@@ -210,12 +201,18 @@ class change_name():
         self.newname.delete(1.0, "1.end")
         if ('\\' in h):
             me.showerror("错误", "昵称中不能使用反斜杠\\")
+            change_name()
         if (len(h) > 20):
             me.showerror("错误", "昵称过长")
+            change_name()
+        if (len(h) == 0):
+            me.showerror("错误", "昵称不能为空")
+            change_name()
         else:
             name.set(h)
             set_id("-1")
             set_name(h)
+            self.frame.grid_forget()
             refresh_menu()
 def change_password():
     forget()
@@ -228,10 +225,10 @@ def restart_program():
 # 界面
 root = tk.Tk()
 I = init_interface()
-
 T = text_interface()
-C = chat()
+
 S = switch()
+C = chat()
 
 
 if __name__ == '__main__':
@@ -245,13 +242,12 @@ if __name__ == '__main__':
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host.get(), port.get()))
+        status[0] = 0
     except:
-        me.showwarning("警告", "连接服务器失败", parent=root)
-    getconnect()
-
+        pass
+    I.__init__()
+    refresh_menu()
+    C.refresh_text()
     forget()
-
-
     root.mainloop()
 
-    name.set("dfFF")
