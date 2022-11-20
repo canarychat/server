@@ -7,6 +7,7 @@
 #include <vector>
 #include <unistd.h>
 #include <algorithm>
+#include <regex>
 
 constexpr int BUFFER_SIZE = 1024;
 constexpr int EVENT_SIZE = 128;
@@ -94,14 +95,24 @@ int main(int arg,char *args[])
     if(arg ==2)
     {
         PORT = strtol(args[1], nullptr, 10);
+        if(PORT == 0 || PORT > 65535)
+        {
+            cout<<"invalid port"<<endl;
+            return -1;
+        }
     }
-    else if(arg >= 3 or arg ==1)
+    else if(arg > 2)
     {
-        cout<<"default port is "<<PORT<<"\nif you want to "
+        cout<<"Invalid argument, if you want to use your own port, using like this:\n"
+              "./server [PORT]"<<endl;
+        return -1;
+    }
+    else if(arg ==1)
+    {
+        cout<<"default port is \n"<<PORT<<"if you want to "
               "use your own port, using like this:\n"
               "./server [PORT]"<<endl;
     }
-
     int listenfd;
     reactor r;
     r.socks.reserve(SOCK_SIZE);

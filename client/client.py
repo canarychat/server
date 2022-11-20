@@ -98,12 +98,12 @@ class text_interface:
 class init_interface:
     def __init__(self):
         root.title("聊天室")
-        root.geometry("800x900+200+300")
+        root.geometry("710x740+200+300")
         root.minsize(400, 300)
         resolution.append(root.winfo_screenwidth())
         resolution.append(root.winfo_screenheight())
         root.maxsize(resolution[0], resolution[1])
-        root.resizable(width=True, height=True)
+        root.resizable(width=False, height=False)
         root.configure(background='light blue')
         self.welcome = tk.Label(root, text='欢迎使用聊天室', bg='light blue', font=('微软雅黑', 20))
         self.welcome.grid()
