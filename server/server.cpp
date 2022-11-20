@@ -6,13 +6,13 @@
 #include <sys/epoll.h>
 #include <vector>
 #include <unistd.h>
-#include <functional>
 #include <algorithm>
 
 constexpr int BUFFER_SIZE = 1024;
 constexpr int EVENT_SIZE = 128;
 constexpr int SOCK_SIZE = 128;
-constexpr int PORT = 1234;
+
+long PORT = 12345;
 
 
 struct sock_item//listenfd and clientfd
@@ -41,7 +41,7 @@ struct reactor
     }
 };
 
-void broad_cast(reactor &r, char *buf, int len)
+void broad_cast(reactor &r, char *buf, size_t len)
 {
     for (auto &sock: r.socks)
     {
@@ -89,9 +89,19 @@ int hdl_msg(sock_item &si, reactor &r)
 }
 
 
-int main()
-{
-    using namespace std;
+int main(int arg,char *args[])
+{using namespace std;
+    if(arg ==2)
+    {
+        PORT = strtol(args[1], nullptr, 10);
+    }
+    else if(arg >= 3 or arg ==1)
+    {
+        cout<<"default port is "<<PORT<<"\nif you want to "
+              "use your own port, using like this:\n"
+              "./server [PORT]"<<endl;
+    }
+
     int listenfd;
     reactor r;
     r.socks.reserve(SOCK_SIZE);

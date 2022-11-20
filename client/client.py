@@ -20,11 +20,15 @@ def send_msg(msg):
         sock.send(bytes(msg, "ascii"))
     except:
         return False
+
+
 def recv_msg():
     try:
         return sock.recv(1024).decode('ascii')
     except:
         return False
+
+
 def test(h, p):
     host.set(h)
     port.set(p)
@@ -32,17 +36,23 @@ def test(h, p):
         sock.send(bytes('\\SYN', "ascii"))
     except:
         return False
+
+
 def connect():
     try:
         sock.close()
     except:
         pass
     restart_program()
+
+
 def disconnect():
     sock.close()
     status[0] = 1
     host.set("未连接服务器")
     refresh_menu()
+
+
 # 界面部分
 
 class text_interface:
@@ -61,12 +71,13 @@ class text_interface:
         self.text.grid(row=2, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self.board.grid(row=3, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
         self.send.grid(row=4, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+
     def button_send_msg(self):
         if (status[0] == 1):
             me.showerror(title="错误", message="未连接服务器")
         msg = self.board.get("1.0", "end")
         self.board.delete("1.0", "end")
-        if(name.get()==""):
+        if (name.get() == ""):
             me.showerror(title="警告", message="请先切换名称")
             return
         if (msg == ""):
@@ -82,6 +93,8 @@ class text_interface:
 
     def forget(self):
         self.frame.grid_forget()
+
+
 class init_interface:
     def __init__(self):
         root.title("聊天室")
@@ -97,13 +110,17 @@ class init_interface:
 
     def forget(self):
         self.welcome.grid_forget()
+
+
 class chat:
     def __init__(self):
         forget()
         T.__init__()
 
-    def refresh_text(self):
-        Thread(target=self.listen).start()
+    def refresh_text(self) -> Thread:
+        pulling = Thread(target=self.listen)
+        pulling.start()
+        return pulling
 
     def listen(self):
         while (True):
@@ -111,6 +128,8 @@ class chat:
             print(msg)
             T.text.insert(1.0, msg)
             time.sleep(0.1)
+
+
 class switch:
     def __init__(self):
         I.forget()
@@ -144,10 +163,14 @@ class switch:
 
     def forget(self):
         self.server_frame.grid_forget()
+
+
 def forget():
     T.forget()
     I.forget()
     S.forget()
+
+
 # 菜单部分
 def refresh_menu():
     # menu
@@ -175,18 +198,25 @@ def refresh_menu():
         main_menu.add_command(label=s, font=("黑体", 12))
     root.configure(menu=main_menu)
 
+
 # 按钮部分
 def login():
     forget()
     if (status[0] == 1):
         me.showerror("错误", "请先连接服务器", parent=root)
     me.showwarning("警告", "该功能开发中", parent=root)
+
+
 def signin():
     forget()
     me.showwarning("警告", "该功能开发中", parent=root)
+
+
 def logout():
     forget()
     me.showwarning("警告", "该功能开发中", parent=root)
+
+
 class change_name():
     def __init__(self):
         forget()
@@ -217,13 +247,18 @@ class change_name():
             set_name(h)
             self.frame.grid_forget()
             refresh_menu()
+
+
 def change_password():
     forget()
     me.showwarning("警告", "该功能开发中", parent=root)
+
+
 # 其他功能
 def restart_program():
     python = sys.executable
     os.execl(python, python, *sys.argv)
+
 
 # 界面
 root = tk.Tk()
@@ -232,7 +267,6 @@ T = text_interface()
 
 S = switch()
 C = chat()
-
 
 if __name__ == '__main__':
     status = [1, 1]
@@ -250,7 +284,6 @@ if __name__ == '__main__':
         pass
     I.__init__()
     refresh_menu()
-    C.refresh_text()
+    pulling = C.refresh_text()
     forget()
     root.mainloop()
-
