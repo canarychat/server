@@ -66,6 +66,9 @@ class text_interface:
             me.showerror(title="错误", message="未连接服务器")
         msg = self.board.get("1.0", "end")
         self.board.delete("1.0", "end")
+        if(name.get()==""):
+            me.showerror(title="警告", message="请先切换名称")
+            return
         if (msg == ""):
             return
         if (len(msg) > 1000):

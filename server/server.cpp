@@ -12,7 +12,7 @@
 constexpr int BUFFER_SIZE = 1024;
 constexpr int EVENT_SIZE = 128;
 constexpr int SOCK_SIZE = 128;
-constexpr int PORT = 12345;
+constexpr int PORT = 1234;
 
 
 struct sock_item//listenfd and clientfd
@@ -127,6 +127,8 @@ int main()
         for (int i = 0; i < nready; i++)//i是epoll循环量，不是vec的循环量
         {
             int clientfd = r.evs[i].data.fd;
+            auto it = find_if(r.socks.begin(), r.socks.end(), [&](sock_item &si) {
+                return si.event.data.fd == clientfd;});//找出clientfd对应的sock_item
             if (listenfd == clientfd)
             {
                 sockaddr_in client{};
@@ -147,32 +149,27 @@ int main()
             }
                 //clientfd
             else if (r.evs[i].events & EPOLLIN)//IN
-            {
-                memset(r.socks[i].rbuf, 0, r.socks[i].rlen);
-                auto ret = recv(clientfd, r.socks[i].rbuf, r.socks[i].rlen, 0);
-                cout << "recving: " << r.socks[i].rbuf << endl;
+            {//find_if
+                memset(it->rbuf, 0, it->rlen);
+                auto ret = recv(clientfd, it->rbuf, it->rlen, 0);
+                cout << "recving: " << it->rbuf << endl;
 
                 if (ret > 0)//client recv properly
                 {
-                    r.socks[i].rbuf[ret] = '\0';
-                    ev = r.socks[i].event;
+                    it->rbuf[ret] = '\0';
+                    ev = it->event;
                     ev.events = EPOLLOUT;
                     ev.data.fd = clientfd;
                     epoll_ctl(r.epfd, EPOLL_CTL_MOD, clientfd, &ev);
-                    auto it = find_if(r.socks.begin(), r.socks.end(), [&](sock_item &si) {
-                        return si.event.data.fd == clientfd;
-                    });
                     hdl_msg(*it, r);
-                    //这里有问题，i是epoll循环量，不是vec的循环量
                 } else if (ret == 0)//客户端关闭
                 {
                     cout << "client closed" << endl;
                     epoll_ctl(r.epfd, EPOLL_CTL_DEL, clientfd, nullptr);
                     if (r.socks.at(i).event.data.fd != -1)
                     {
-                        auto it = find_if(r.socks.begin(), r.socks.end(), [&](sock_item &si) {
-                            return si.event.data.fd == clientfd;
-                        });
+
+
                         r.socks.erase(it);
                     }
 
@@ -186,12 +183,12 @@ int main()
 
             } else if (r.evs[i].events & EPOLLOUT)//OUT
             {
-                send(clientfd, r.socks[i].wbuf, strlen(r.socks[i].wbuf), 0);
-                memset(r.socks[i].wbuf, 0, r.socks[i].wlen);
-                ev = r.socks[i].event;
+                send(clientfd, it->wbuf, strlen(it->wbuf), 0);
+                memset(it->wbuf, 0, it->wlen);
+                ev = it->event;
                 ev.events = EPOLLIN;
                 ev.data.fd = clientfd;
-                r.socks[i].event = ev;
+                it->event = ev;
                 epoll_ctl(r.epfd, EPOLL_CTL_MOD, clientfd, &ev);
             }
         }
