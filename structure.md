@@ -2,34 +2,39 @@
 
 [toc]
 
-## client 
+## Server 
 
-账户
+Epoll is used to listen, recv and send.
 
-记录
+the class reactor contains the `vector<sock_item>` which  stores the information of every clientfd's buffer and event. 
+
+## Client 
+
+Tkinter is used for the GUI
+
+classes are used to structure the functional pages.
+
+One Thread in the class chat is listening for messages.
+
+### Status
+
+the array `status` is used to sign the status of  client.
+
+| Type / number  | 0      | 1             |
+| -------------- | ------ | ------------- |
+| server connect | normal | not connected |
+| logged in      | yes    | no            |
+
+## message format 
+
+\XXX is used for functional message, user can not send a message with char `\`
 
 
+| \SYN | query the server status  // not used for now |
+| ---- | :------------------------------------------- |
+| \MSG | send a users message                         |
 
-## status
+## TODO 
 
-
-
-0-服务器状态
-
-0正常 1断联
-
-1- 账号状态
-
-0正常 1未登录
-
-2- 未登录账号
-4- 
-
-## 报文
-
-SYN
-
-SYNACK
-
-MSG
+the next step is to add the account functions 
 
