@@ -18,6 +18,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f1b9fb76-119f-4ee7-b0d6-6c35e4c3943e" name="变更" comment="0.0.0.221120.beta">
+      <change afterPath="$PROJECT_DIR$/client/release/linux_client" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.cpp" afterDir="false" />
@@ -48,12 +49,17 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
+    "WebServerToolWindowFactoryState": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.mappings": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.symlinks": "true",
+    "WebServerToolWindowPanel.toolwindow.show.date": "false",
+    "WebServerToolWindowPanel.toolwindow.show.permissions": "false",
+    "WebServerToolWindowPanel.toolwindow.show.size": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "last_opened_file_path": "/home/lambert/CLionProjects/chatroom",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "web.server",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "structure.view.defaults.are.configured": "true"
   }
 }]]></component>
@@ -109,7 +115,8 @@
       <workItem from="1668817854844" duration="70000" />
       <workItem from="1668818090461" duration="111000" />
       <workItem from="1668945314980" duration="6582000" />
-      <workItem from="1668952888712" duration="798000" />
+      <workItem from="1668952888712" duration="2083000" />
+      <workItem from="1670030536185" duration="414000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <created>1668814174783</created>
@@ -132,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668951568349</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="0.0.0.221120.beta">
+      <created>1668953990259</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1668953990259</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,7 +174,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/client/client.py</url>
-          <line>168</line>
+          <line>173</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>

@@ -114,7 +114,9 @@ class init_interface:
 
 class chat:
     def __init__(self):
-        forget()
+        T.forget()
+        I.forget()
+        S.forget()
         T.__init__()
 
     def refresh_text(self) -> Thread:
@@ -128,6 +130,9 @@ class chat:
             print(msg)
             T.text.insert(1.0, msg)
             time.sleep(0.1)
+
+    def forget(self):
+        T.forget()
 
 
 class switch:
@@ -165,12 +170,6 @@ class switch:
         self.server_frame.grid_forget()
 
 
-def forget():
-    T.forget()
-    I.forget()
-    S.forget()
-
-
 # 菜单部分
 def refresh_menu():
     # menu
@@ -183,7 +182,7 @@ def refresh_menu():
     accountmenu.add_command(label="登录", font=("黑体", 12), command=login)
     accountmenu.add_command(label="登出", font=("黑体", 12), command=logout)
     accountmenu.add_separator()
-    accountmenu.add_command(label="修改昵称", font=("黑体", 12), command=change_name)
+    accountmenu.add_command(label="修改昵称", font=("黑体", 12), command=CN.__init__)
     accountmenu.add_command(label="修改密码", font=("黑体", 12), command=change_password)
     main_menu.add_cascade(label=name.get(), menu=accountmenu, font=("黑体", 12))
 
@@ -201,32 +200,47 @@ def refresh_menu():
 
 # 按钮部分
 def login():
-    forget()
+    T.forget()
+    I.forget()
+    S.forget()
+    CN.forget()
+    C.forget()
     if (status[0] == 1):
         me.showerror("错误", "请先连接服务器", parent=root)
     me.showwarning("警告", "该功能开发中", parent=root)
 
 
 def signin():
-    forget()
+    T.forget()
+    I.forget()
+    S.forget()
+    CN.forget()
+    C.forget()
     me.showwarning("警告", "该功能开发中", parent=root)
 
 
 def logout():
-    forget()
+    T.forget()
+    I.forget()
+    S.forget()
+    CN.forget()
+    C.forget()
     me.showwarning("警告", "该功能开发中", parent=root)
 
 
 class change_name():
     def __init__(self):
-        forget()
-        self.frame = tk.Frame(root, width=400, height=300, bg="light blue")
-        self.frame.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
-        text01 = tk.Label(self.frame, text="新昵称", bg="green", font=("黑体", 12))
+        T.forget()
+        I.forget()
+        S.forget()
+        C.forget()
+        self.CN_frame = tk.Frame(root, width=400, height=300, bg="light blue")
+        self.CN_frame.grid(row=5, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+        text01 = tk.Label(self.CN_frame, text="新昵称", bg="green", font=("黑体", 12))
         text01.grid(row=2, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
-        self.newname = tk.Text(self.frame, width=20, height=1, bg='white', font=("黑体", 12))
+        self.newname = tk.Text(self.CN_frame, width=20, height=1, bg='white', font=("黑体", 12))
         self.newname.grid(row=2, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
-        accept = tk.Button(self.frame, text="确定", font=("黑体", 12), command=self.get)
+        accept = tk.Button(self.CN_frame, text="确定", font=("黑体", 12), command=self.get)
         accept.grid(row=5, column=3, sticky=tk.N + tk.S + tk.E + tk.W)
 
     def get(self):
@@ -234,23 +248,30 @@ class change_name():
         self.newname.delete(1.0, "1.end")
         if ('\\' in h):
             me.showerror("错误", "昵称中不能使用反斜杠\\")
-            change_name()
+            CN.__init__()
         if (len(h) > 20):
             me.showerror("错误", "昵称过长")
-            change_name()
+            CN.__init__()
         if (len(h) == 0):
             me.showerror("错误", "昵称不能为空")
-            change_name()
+            CN.__init__()
         else:
             name.set(h)
             set_id("-1")
             set_name(h)
-            self.frame.grid_forget()
+            self.CN_frame.grid_forget()
             refresh_menu()
+
+    def forget(self):
+        self.CN_frame.grid_forget()
 
 
 def change_password():
-    forget()
+    T.forget()
+    I.forget()
+    S.forget()
+    CN.forget()
+    C.forget()
     me.showwarning("警告", "该功能开发中", parent=root)
 
 
@@ -262,11 +283,20 @@ def restart_program():
 
 # 界面
 root = tk.Tk()
+
 I = init_interface()
 T = text_interface()
-
 S = switch()
 C = chat()
+CN= change_name()
+
+def forget():
+    T.forget()
+    I.forget()
+    S.forget()
+    C.forget()
+    CN.forget()
+
 
 if __name__ == '__main__':
     status = [1, 1]

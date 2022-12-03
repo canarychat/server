@@ -7,7 +7,6 @@
 #include <vector>
 #include <unistd.h>
 #include <algorithm>
-#include <regex>
 
 constexpr int BUFFER_SIZE = 1024;
 constexpr int EVENT_SIZE = 128;
@@ -109,7 +108,7 @@ int main(int arg,char *args[])
     }
     else if(arg ==1)
     {
-        cout<<"default port is \n"<<PORT<<"if you want to "
+        cout<<"default port is "<<PORT<<"\nif you want to "
               "use your own port, using like this:\n"
               "./server [PORT]"<<endl;
     }
