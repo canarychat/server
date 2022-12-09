@@ -4,7 +4,7 @@
 #include <cstring>
 #include <string>
 #include <sys/epoll.h>
-#include <vector>
+#include <map>
 #include <unistd.h>
 #include <algorithm>
 
@@ -21,6 +21,11 @@ struct sock_item//listenfd and clientfd
     char rbuf[BUFFER_SIZE] = {0};
     int wlen = BUFFER_SIZE;
     int rlen = BUFFER_SIZE;
+    class usr
+    {
+        uint32_t id;
+        std::string name;
+    };
     epoll_event event{};
     sock_item()
     {
@@ -31,7 +36,7 @@ struct sock_item//listenfd and clientfd
 
 struct reactor
 {
-    std::vector<sock_item> socks;
+    std::map<uint32_t ,sock_item> socks;
     int epfd;
     epoll_event evs[EVENT_SIZE]{};
 
@@ -45,11 +50,11 @@ void broad_cast(reactor &r, char *buf, size_t len)
 {
     for (auto &sock: r.socks)
     {
-        memcpy(sock.wbuf, buf, len);
-        auto ev = sock.event;
+        memcpy(sock.second.wbuf, buf, len);
+        auto ev = sock.second.event;
         ev.events |= EPOLLOUT;
-        epoll_ctl(r.epfd, EPOLL_CTL_MOD, sock.event.data.fd, &ev);
-        std::cout << "broad_cast to:"<<sock.event.data.fd << std::endl;
+        epoll_ctl(r.epfd, EPOLL_CTL_MOD, sock.second.event.data.fd, &ev);
+        std::cout << "broad_cast to:"<<sock.second.event.data.fd << std::endl;
     }
 }
 
@@ -114,7 +119,6 @@ int main(int arg,char *args[])
     }
     int listenfd;
     reactor r;
-    r.socks.reserve(SOCK_SIZE);
     if ((listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         std::cerr << "Error creating socket" << std::endl;
@@ -148,7 +152,7 @@ int main(int arg,char *args[])
         {
             int clientfd = r.evs[i].data.fd;
             auto it = find_if(r.socks.begin(), r.socks.end(), [&](sock_item &si) {
-                return si.event.data.fd == clientfd;});//找出clientfd对应的sock_item
+                return si.second.event.data.fd == clientfd;});//找出clientfd对应的sock_item
             if (listenfd == clientfd)
             {
                 sockaddr_in client{};
@@ -165,12 +169,12 @@ int main(int arg,char *args[])
                 epoll_ctl(r.epfd, EPOLL_CTL_ADD, connfd, &ev);
                 sock_item si{};
                 si.event = ev;
-                r.socks.push_back(si);
+                r.socks.insert(si);
             }
                 //clientfd
             else if (r.evs[i].events & EPOLLIN)//IN
             {//find_if
-                memset(it->rbuf, 0, it->rlen);
+                memset(it->second.rbuf, 0, it->rlen);
                 auto ret = recv(clientfd, it->rbuf, it->rlen, 0);
                 cout << "recving: " << it->rbuf << endl;
 

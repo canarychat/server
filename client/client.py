@@ -98,7 +98,11 @@ class text_interface:
 class init_interface:
     def __init__(self):
         root.title("聊天室")
-        root.geometry("710x740+200+300")
+        # windows
+        if os.name == 'nt':
+            root.geometry("710x740+200+300")
+        else :
+            root.geometry("800x600+200+300")
         root.minsize(400, 300)
         resolution.append(root.winfo_screenwidth())
         resolution.append(root.winfo_screenheight())
