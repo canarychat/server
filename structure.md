@@ -21,20 +21,28 @@ One Thread in the class chat is listening for messages.
 the array `status` is used to sign the status of  client.
 
 | Type / number  | 0      | 1             |
-| -------------- | ------ | ------------- |
+| :------------- | ------ | ------------- |
 | server connect | normal | not connected |
 | logged in      | yes    | no            |
 
 ## message format 
 
-\XXX is used for functional message, user can not send a message with char `\`
+ [message.h](./server.message/h) lists message types.
 
+| 0~11 bit        | 12~23 bit                            | 24~31 bit    |
+| --------------- | ------------------------------------ | ------------ |
+| version (0x000) | length (0~4095)(not included header) | message type |
 
-| \SYN | query the server status  // not used for now |
-| ---- | :------------------------------------------- |
-| \MSG | send a users message                         |
+#### LOGIN: userid passwd
+#### LOGOUT: userid
+
+#### REGISTER: username passwd
+
+#### MESSAGE: userid message
+
+####  
 
 ## TODO 
 
-the next step is to add the account functions 
+the next step is to add the account functions.
 

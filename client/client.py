@@ -85,10 +85,14 @@ class text_interface:
         if (len(msg) > 1000):
             me.showerror("错误", "消息过长")
             return
-        if ('\\' in msg):
-            me.showerror("错误", "消息中不能包含\\")
-            return
-        msg = '\\MSG ' + name.get() + ":" + msg
+        # version = 0x010
+        # length = len(msg)
+        # type = 3
+        # head =  bytes(type + length << 8 + version << 20)
+        # print(version)
+        # print(length)
+        # print(type)
+        # print(str(head))
         send_msg(msg)
 
     def forget(self):
@@ -101,13 +105,13 @@ class init_interface:
         # windows
         if os.name == 'nt':
             root.geometry("710x740+200+300")
-        else :
-            root.geometry("800x600+200+300")
+        else:
+            root.geometry("800x1200+200+300")
         root.minsize(400, 300)
         resolution.append(root.winfo_screenwidth())
         resolution.append(root.winfo_screenheight())
         root.maxsize(resolution[0], resolution[1])
-        root.resizable(width=False, height=False)
+        root.resizable(width=True, height=True)
         root.configure(background='light blue')
         self.welcome = tk.Label(root, text='欢迎使用聊天室', bg='light blue', font=('微软雅黑', 20))
         self.welcome.grid()
@@ -292,7 +296,8 @@ I = init_interface()
 T = text_interface()
 S = switch()
 C = chat()
-CN= change_name()
+CN = change_name()
+
 
 def forget():
     T.forget()

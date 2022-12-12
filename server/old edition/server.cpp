@@ -22,6 +22,7 @@ struct sock_item//listenfd and clientfd
     int wlen = BUFFER_SIZE;
     int rlen = BUFFER_SIZE;
     epoll_event event{};
+
     sock_item()
     {
         event.data.fd = -1;
@@ -31,7 +32,7 @@ struct sock_item//listenfd and clientfd
 
 struct reactor
 {
-    std::vector<sock_item> socks;
+    std::vector <sock_item> socks;
     int epfd;
     epoll_event evs[EVENT_SIZE]{};
 
@@ -49,7 +50,7 @@ void broad_cast(reactor &r, char *buf, size_t len)
         auto ev = sock.event;
         ev.events |= EPOLLOUT;
         epoll_ctl(r.epfd, EPOLL_CTL_MOD, sock.event.data.fd, &ev);
-        std::cout << "broad_cast to:"<<sock.event.data.fd << std::endl;
+        std::cout << "broad_cast to:" << sock.event.data.fd << std::endl;
     }
 }
 
@@ -89,17 +90,17 @@ int hdl_msg(sock_item &si, reactor &r)
 }
 
 
-int main(int arg,char *args[])
-{using namespace std;
-    if(arg ==2)
+int main(int arg, char *args[])
+{
+    using namespace std;
+    if (arg == 2)
     {
         PORT = strtol(args[1], nullptr, 10);
-    }
-    else if(arg >= 3 or arg ==1)
+    } else if (arg >= 3 or arg == 1)
     {
-        cout<<"default port is "<<PORT<<"\nif you want to "
-              "use your own port, using like this:\n"
-              "./server [PORT]"<<endl;
+        cout << "default port is " << PORT << "\nif you want to "
+                                              "use your own port, using like this:\n"
+                                              "./server [PORT]" << endl;
     }
 
     int listenfd;
@@ -115,7 +116,7 @@ int main(int arg,char *args[])
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(PORT);
-    if (bind(listenfd, (sockaddr *) &servaddr, sizeof(servaddr)) == -1)
+    if (bind(listenfd, (sockaddr * ) & servaddr, sizeof(servaddr)) == -1)
     {
         std::cerr << strerror(errno) << std::endl;
         std::cerr << "Error binding socket" << std::endl;
@@ -137,13 +138,15 @@ int main(int arg,char *args[])
         for (int i = 0; i < nready; i++)//i是epoll循环量，不是vec的循环量
         {
             int clientfd = r.evs[i].data.fd;
-            auto it = find_if(r.socks.begin(), r.socks.end(), [&](sock_item &si) {
-                return si.event.data.fd == clientfd;});//找出clientfd对应的sock_item
+            auto it = find_if(r.socks.begin(), r.socks.end(), [&](sock_item &si)
+            {
+                return si.event.data.fd == clientfd;
+            });//找出clientfd对应的sock_item
             if (listenfd == clientfd)
             {
                 sockaddr_in client{};
                 socklen_t len = sizeof(client);
-                int connfd = accept(listenfd, (sockaddr *) &client, &len);
+                int connfd = accept(listenfd, (sockaddr * ) & client, &len);
                 if (connfd < 0)
                 {
                     std::cerr << "Error accepting connection" << std::endl;
