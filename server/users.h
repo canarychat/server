@@ -8,6 +8,7 @@
 #include <event2/buffer.h>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 struct User
 {
@@ -15,12 +16,12 @@ struct User
     std::string username;
     uint32_t id;
 };
-std::unordered_map<size_t ,User> user_map;
-
-void broadcast_to_all(const char *data, size_t len)
+//std::unordered_map<uint32_t ,User> user_map;
+std::vector<User> user_vec;
+void broadcast_to_all(evbuffer *input)
 {
-    for(auto &user : user_map)
+    for(auto &user : user_vec)
     {
-        bufferevent_write(user.second.bev, data, len);
+        evbuffer_add_buffer(user.bev->output_buffer, input);
     }
 }

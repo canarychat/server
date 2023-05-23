@@ -29,9 +29,9 @@ the array `status` is used to sign the status of  client.
 
  [message.h](./server.message/h) lists message types.
 
-| 0~11 bit        | 12~23 bit                            | 24~31 bit    |
-| --------------- | ------------------------------------ | ------------ |
-| version (0x000) | length (0~4095)(not included header) | message type |
+| 0~11 bit        | 12~23 bit                          | 24~31 bit    |
+| --------------- | ---------------------------------- | ------------ |
+| version (0x000) | length (0~4095)(not included head) | message type |
 
 #### LOGIN: userid passwd
 #### LOGOUT: userid
@@ -40,7 +40,40 @@ the array `status` is used to sign the status of  client.
 
 #### MESSAGE: userid message
 
-####  
+ ```mermaid
+   
+flowchart
+subgraph server
+t{task}
+subgraph account
+p1[login]
+p2[register]
+db1[(Redis)]
+end
+p1 <--> db1
+p2 <--> db1
+t --> p3[message]
+t --> p2
+t --> p1
+db1 <--> db2
+db2[(mySql)]
+end
+
+subgraph client
+s1([start]) --> connect
+
+connect --> login
+connect --> signup
+login --> chat
+login -.LOGIN.- p1
+connect --> e
+signup --> chat
+signup -.REGISTER.- p2
+chat -.MESSAGE.- p3
+chat --> e([end])
+end
+
+ ```
 
 ## TODO 
 
