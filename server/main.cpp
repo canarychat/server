@@ -1,54 +1,106 @@
 //
 // Created by lambert on 22-12-11.
 //
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
 
-#include <hiredis/hiredis.h>
-
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Timestamp.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/Exception.h"
+#include "Poco/ThreadPool.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/HelpFormatter.h"
 #include <iostream>
 
-#include "callbacks.h"
+using Poco::Net::ServerSocket;
+using Poco::Net::HTTPRequestHandler;
+using Poco::Net::HTTPRequestHandlerFactory;
+using Poco::Net::HTTPServer;
+using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPServerResponse;
+using Poco::Net::HTTPServerParams;
+using Poco::Timestamp;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+using Poco::ThreadPool;
+using Poco::Util::ServerApplication;
+using Poco::Util::Application;
+using Poco::Util::Option;
+using Poco::Util::OptionSet;
+using Poco::Util::HelpFormatter;
 
-uint16_t PORT = 8888;
+class MainServer : public Poco::Util::ServerApplication {
+ public:
+  MainServer() : _helpRequested(false) {
+  }
+
+  ~MainServer() = default;
+
+ protected:
+
+  void initialize(Application &self) {
+    loadConfiguration(); // load default configuration files, if present
+    ServerApplication::initialize(self);
+  }
+
+  void uninitialize() {
+    ServerApplication::uninitialize();
+  }
+
+  void defineOptions(OptionSet &options) {
+    ServerApplication::defineOptions(options);
+
+    options.addOption(
+        Option("help", "h", "display help information on command line arguments")
+            .required(false)
+            .repeatable(false));
+    options.addOption(
+        Option("port", "p", "set port number")
+            .required(false)
+            .repeatable(false)
+            .argument("number")
+            .binding("port")
+        );
+  }
+
+  void handleOption(const std::string &name, const std::string &value) {
+    ServerApplication::handleOption(name, value);
+    if (name == "help")
+      _helpRequested = true;
+
+  }
+
+  void displayHelp(){
+    HelpFormatter helpFormatter(options());
+    helpFormatter.setCommand(commandName());
+    helpFormatter.setUsage("OPTIONS");
+    helpFormatter.setHeader("A web server holds a chatroom server");
+    helpFormatter.format(std::cout);
+  }
+
+  int main(const std::vector<std::string> &args) {
+    if (_helpRequested) {
+      displayHelp();
+    } else {
+      waitForTerminationRequest();
+    }
+    return Application::EXIT_OK;
+  }
+
+ private:
+  bool _helpRequested;
+};
 
 int main(int argc, char **argv) {
-
-    using namespace std;
-    //初始参数判断
-    if (argc == 2)
-    {
-        PORT = strtol(argv[1], nullptr, 10);
-        if(PORT == 0 || PORT > 65535)
-        {
-            cout << "invalid port" << endl;
-            return -1;
-        }
-    } else if (argc >= 3 or argc == 1)
-    {
-        cout << "default port is " << PORT << "\nif you want to "
-                                              "use your own port, using like this:\n"
-                                              "./server [PORT]" << endl;
-    }
-
-
-    auto base = event_base_new();
-    if (!base)
-    {
-        cerr << "event_base_new failed" << endl;
-        return -1;
-    }
-
-    auto sin = sockaddr_in{0};
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons(PORT);
-    sin.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    auto listener = evconnlistener_new_bind(base, accept_cb, base, LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE, -1,
-                                            (struct sockaddr *) &sin, sizeof(sin));
-
-    evconnlistener_set_error_cb(listener, accept_error_cb);
-
-    event_base_loop(base, 0);
+  MainServer server;
+  return server.run(argc, argv);
 }

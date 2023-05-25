@@ -1,12 +1,8 @@
-cmake_minimum_required(VERSION 3.24)
-project(chatroom_server VERSION 0.1.0)
+cmake_minimum_required(VERSION 3.25)
+project(chatroom_server)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# 导入libevent
-find_package(Libevent REQUIRED)
-
-set(Libevent_LIBS event)
-add_executable(chatroom main.cpp callbacks.h users.h message.h)
-target_include_directories(chatroom PRIVATE ${Libevent_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} ${Libevent_LIBS})
+find_package(Poco REQUIRED COMPONENTS Foundation Util Net XML JSON)
+add_executable(server main.cpp)
+target_link_libraries(server Poco::Foundation Poco::Util Poco::Net Poco::XML Poco::JSON)
