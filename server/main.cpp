@@ -2,24 +2,39 @@
 // Created by lambert on 22-12-11.
 //
 
+#include "DataManager.h"
+#include "ChatHttp.h"
+
 #include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/WebSocket.h"
+#include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/WebSocket.h"
 #include "Poco/Net/HTTPServerParams.h"
-#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
+#include "Poco/Net/HTTPServerResponseImpl.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/WebSocket.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/Util/OptionSet.h"
+#include "Poco/Util/OptionCallback.h"
+#include "Poco/Util/Option.h"
+#include "Poco/Util/HelpFormatter.h"
+#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Util/LoggingConfigurator.h"
+#include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Net/HTTPRequest.h"
 #include "Poco/Timestamp.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
-#include "Poco/Exception.h"
-#include "Poco/ThreadPool.h"
-#include "Poco/Util/ServerApplication.h"
-#include "Poco/Util/Option.h"
-#include "Poco/Util/OptionSet.h"
-#include "Poco/Util/HelpFormatter.h"
-#include <iostream>
 
 using Poco::Net::ServerSocket;
 using Poco::Net::HTTPRequestHandler;
@@ -41,6 +56,8 @@ using Poco::Util::HelpFormatter;
 class MainServer : public Poco::Util::ServerApplication {
  public:
   MainServer() : _helpRequested(false) {
+    addSubsystem(new DataManager);
+    addSubsystem(new ChatHttpSubSystem);
   }
 
   ~MainServer() = default;
@@ -91,6 +108,9 @@ class MainServer : public Poco::Util::ServerApplication {
     if (_helpRequested) {
       displayHelp();
     } else {
+      unsigned short port = (unsigned short) config().getInt("MainServer.port", 12300);
+      std::string format(config().getString("MainServer.format", DateTimeFormat::SORTABLE_FORMAT));
+      ThreadPool::defaultPool();
       waitForTerminationRequest();
     }
     return Application::EXIT_OK;
