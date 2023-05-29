@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "Route.h"
 
 #include <Poco/Util/Application.h>
 #include <Poco/Net/HTTPServer.h>
