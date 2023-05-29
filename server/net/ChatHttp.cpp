@@ -28,7 +28,7 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
   Application &app = Application::instance();
   auto request_method = request.getMethod();
   auto request_uri = request.getURI();
-  app.logger().information("request method: " + request_method + " request uri: " + request_uri);
+  poco_information_f2(app.logger(), "request method: %s request uri: %s", request_method, request_uri);
   for (const auto &route : routeTable) {
     std::regex route_regex(route.first.pattern);
     std::smatch match_result;
@@ -37,7 +37,13 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
       return;
     }
   }
+  //Not Found
+  std::ostream &ostr = response.send();
+  Poco::JSON::Object::Ptr json = new Poco::JSON::Object;
+  json->set("code", 404);
+  json->set("msg", "api not found");
+  json->stringify(ostr);
+  poco_warning_f1(app.logger(), "api not found: %s", request_uri);
   response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-  response.send() << "Not found";
 
 }

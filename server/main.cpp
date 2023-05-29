@@ -35,6 +35,9 @@
 #include "Poco/Timestamp.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/FormattingChannel.h"
+#include "Poco/ConsoleChannel.h"
 
 using Poco::Net::ServerSocket;
 using Poco::Net::HTTPRequestHandler;
@@ -67,6 +70,12 @@ class MainServer : public Poco::Util::ServerApplication {
   void initialize(Application &self) {
     loadConfiguration(); // load default configuration files, if present
     ServerApplication::initialize(self);
+    std::string pattern = config().getString("MainServer.logPattern","[%p] - %Y-%m-%d %H:%M:%S (%O:%u) %t");
+    auto* pPF = new Poco::PatternFormatter(pattern);
+    auto* pCC = new Poco::ConsoleChannel;
+    auto* pFC = new Poco::FormattingChannel(pPF,pCC);
+
+    this->logger().setChannel(pFC);
   }
 
   void uninitialize() {
@@ -105,6 +114,8 @@ class MainServer : public Poco::Util::ServerApplication {
   }
 
   int main(const std::vector<std::string> &args) {
+
+    poco_information(logger(),"MainServerStarted");
     if (_helpRequested) {
       displayHelp();
     } else {

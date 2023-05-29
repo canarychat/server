@@ -38,6 +38,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
+#include <Poco/JSON/Object.h>
+#include <Poco/JSON/Parser.h>
 
 using Poco::Net::ServerSocket;
 using Poco::Net::HTTPRequestHandler;
@@ -60,17 +62,92 @@ struct RouteKey {
   std::string requestType;
   std::regex pattern;
 };
-using Route = std::pair<RouteKey, std::function<void(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)>>;
+using Route = std::pair<RouteKey, std::function<void(HTTPServerRequest &, HTTPServerResponse &)>>;
 
 inline std::vector<Route> routeTable{
-    {{"GET", std::regex("/.*")},
-     [](Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
-      response.setChunkedTransferEncoding(true);
-      response.setContentType("text/html");
-      std::ostream &ostr = response.send();
-      ostr << "<html><head><title>WebSocketServer</title></head>";
-      ostr << "<body><h1>WebSocketServer</h1>";
-      ostr << "<p><a href=\"/chat\">Chat</a></p>";
-      ostr << "</body></html>";
-    }}
+    // Register
+    {{"POST", std::regex("/register")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       response.setChunkedTransferEncoding(true);
+       response.setContentType("application/json");
+       std::ostream &ostr = response.send();
+       Poco::JSON::Object::Ptr json = new Poco::JSON::Object;
+       Poco::JSON::Object::Ptr dataObject = new Poco::JSON::Object;
+       dataObject->set("id", 0);
+       json->set("code", 0);
+       json->set("msg", "ok");
+       json->set("data", dataObject);
+
+       json->stringify(ostr);
+     }},
+    // Login
+    {{"POST", std::regex("/login")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle login request
+     }},
+    // Get Chatrooms List
+    {{"GET", std::regex("/chatrooms")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle get chatrooms list request
+     }},
+    // Create Chatroom
+    {{"POST", std::regex("/chatroom")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle create chatroom request
+     }},
+    // Get Chatroom Info
+    {{"GET", std::regex("/chatrooms/.+")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle get chatroom info request
+     }},
+    // Get Chatroom Member Info
+    {{"GET", std::regex("/chatrooms/.+/member")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle get chatroom member info request
+     }},
+    // Update Chatroom Info
+    {{"PUT", std::regex("/chatrooms/.+")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle update chatroom info request
+     }},
+    // Delete Chatroom
+    {{"DELETE", std::regex("/chatrooms/.+")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle delete chatroom request
+     }},
+    // Add Chatroom Member
+    {{"POST", std::regex("/chatrooms/.+/member")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle add chatroom member request
+     }},
+    // Delete Chatroom Member
+    {{"DELETE", std::regex("/chatrooms/.+/member")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle delete chatroom member request
+     }},
+    // Get Users List
+    {{"GET", std::regex("/users")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle get users list request
+     }},
+    // Get User Info
+    {{"GET", std::regex("/users/.+")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle get user info request
+     }},
+    // Update User Info
+    {{"PUT", std::regex("/users/.+")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle update user info request
+     }},
+    // Delete User
+    {{"DELETE", std::regex("/users/.+")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle delete user request
+     }},
+    // Index Entrance
+    {{"GET", std::regex("/")},
+     [](HTTPServerRequest &request, HTTPServerResponse &response) {
+       // handle index entrance request
+     }}
 };
