@@ -1,0 +1,9 @@
+{
+  "name" : "chatroom-server",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "0ccb3d11406922bef1dcc29002f68f633a321f19",
+  "dependencies" : [ {
+    "name" : "poco",
+    "version>=" : "1.12.4#4"
+  } ]
+}

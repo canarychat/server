@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="CMakePresetLoader">{
   &quot;useNewFormat&quot;: true
 }</component>
@@ -8,20 +11,33 @@
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="network_programming" targetName="server" />
+      <config projectName="chatroom_server" targetName="server" />
     </generated>
   </component>
   <component name="CMakeSettings" AUTO_RELOAD="true">
-    <configurations>
-      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
-    </configurations>
+    <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f1b9fb76-119f-4ee7-b0d6-6c35e4c3943e" name="变更" comment="0.0.0.221119.alpha">
+    <list default="true" id="f1b9fb76-119f-4ee7-b0d6-6c35e4c3943e" name="变更" comment="backup">
+      <change afterPath="$PROJECT_DIR$/server/server.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/server/vcpkg.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/config.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asset/chatroom.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/asset/chatroom.xbm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/asset/test.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/client.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/handle_config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/release/linux_client" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/status.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/server/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/callbacks.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/message.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/old edition/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/old edition/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/old edition/server.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/users.h" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,10 +51,16 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="e6hjc8xg" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2Hk16JGMvFAeeRZk9NdXIriuGHM" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -49,55 +71,37 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
+    "WebServerToolWindowFactoryState": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.mappings": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.symlinks": "true",
+    "WebServerToolWindowPanel.toolwindow.show.date": "false",
+    "WebServerToolWindowPanel.toolwindow.show.permissions": "false",
+    "WebServerToolWindowPanel.toolwindow.show.size": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "develop",
     "last_opened_file_path": "/home/lambert/CLionProjects/chatroom",
-    "structure.view.defaults.are.configured": "true"
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "structure.view.defaults.are.configured": "true",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="CMake 应用程序.server">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/server" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="server" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="chatroom_server" TARGET_NAME="server" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="chatroom_server" RUN_TARGET_NAME="server">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="server" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="network_programming" TARGET_NAME="server" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="network_programming" RUN_TARGET_NAME="server">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="client" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/PycharmProjects/pythonProject/venv/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/client" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/client/client.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="CMake 应用程序.server" />
-      <item itemvalue="Python.client" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.client" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -112,7 +116,29 @@
       <workItem from="1668816245107" duration="1314000" />
       <workItem from="1668817854844" duration="70000" />
       <workItem from="1668818090461" duration="111000" />
-      <workItem from="1668945314980" duration="2413000" />
+      <workItem from="1668945314980" duration="6582000" />
+      <workItem from="1668952888712" duration="2083000" />
+      <workItem from="1670030536185" duration="414000" />
+      <workItem from="1670143876324" duration="83000" />
+      <workItem from="1670143981078" duration="647000" />
+      <workItem from="1670147196414" duration="1117000" />
+      <workItem from="1670547325702" duration="636000" />
+      <workItem from="1670755537392" duration="5001000" />
+      <workItem from="1670804980452" duration="12925000" />
+      <workItem from="1670825257652" duration="2776000" />
+      <workItem from="1671328295846" duration="1324000" />
+      <workItem from="1671434221251" duration="1587000" />
+      <workItem from="1678284737572" duration="1266000" />
+      <workItem from="1678358216377" duration="122000" />
+      <workItem from="1678358346313" duration="40000" />
+      <workItem from="1678358397120" duration="4000" />
+      <workItem from="1678451350578" duration="207000" />
+      <workItem from="1678459881687" duration="1024000" />
+      <workItem from="1684827097697" duration="481000" />
+      <workItem from="1684827588628" duration="70000" />
+      <workItem from="1684827669763" duration="1457000" />
+      <workItem from="1684906408795" duration="1697000" />
+      <workItem from="1684987837052" duration="10874000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <created>1668814174783</created>
@@ -128,18 +154,64 @@
       <option name="project" value="LOCAL" />
       <updated>1668821523505</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="0.0.0.221120.beta">
+      <created>1668951568349</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1668951568349</updated>
+    </task>
+    <task id="LOCAL-00004" summary="0.0.0.221120.beta">
+      <created>1668953990259</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1668953990259</updated>
+    </task>
+    <task id="LOCAL-00005" summary="0.1.0.221212.developing">
+      <created>1670823126360</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1670823126360</updated>
+    </task>
+    <task id="LOCAL-00006" summary="backup">
+      <created>1684827216150</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1684827216150</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticEditVcpkgJson value="false" />
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticFoundErrors value="true" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/develop" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -148,22 +220,24 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="dev" />
     <MESSAGE value="0.0.0.221119.alpha" />
-    <option name="LAST_COMMIT_MESSAGE" value="0.0.0.221119.alpha" />
+    <MESSAGE value="0.0.0.221120.beta" />
+    <MESSAGE value="0.1.0.221212.developing" />
+    <MESSAGE value="backup" />
+    <option name="LAST_COMMIT_MESSAGE" value="backup" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/client/client.py</url>
-          <line>147</line>
+          <line>181</line>
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/server/server.cpp</url>
-          <line>70</line>
-          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
