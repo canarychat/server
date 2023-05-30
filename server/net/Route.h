@@ -77,7 +77,6 @@ inline std::vector<Route> routeTable{
        json->set("code", 0);
        json->set("msg", "ok");
        json->set("data", dataObject);
-
        json->stringify(ostr);
      }},
     // Login

@@ -4,22 +4,20 @@ USE ChatRoomDB;
 
 CREATE TABLE users
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    username   VARCHAR(255) NOT NULL UNIQUE,
+    id         INT AUTO_INCREMENT PRIMARY KEY,
+    username   VARCHAR(255) NOT NULL,
     password   VARCHAR(255) NOT NULL,
-    salt       CHAR(32) NOT NULL,
-    email      VARCHAR(255) UNIQUE NULL,
-    create_time DATE DEFAULT CURRENT_DATE,
-    update_time DATE DEFAULT CURRENT_DATE
+    email      VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE rooms
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    id         INT AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(255) NOT NULL,
-    owner_id   INT NOT NULL REFERENCES users (id),
-    create_time DATE DEFAULT CURRENT_DATE,
-    update_time DATE DEFAULT CURRENT_DATE
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE user_room_relation
@@ -29,16 +27,16 @@ CREATE TABLE user_room_relation
     PRIMARY KEY (user_id, room_id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (room_id) REFERENCES rooms (id),
-    joined_at DATE DEFAULT CURRENT_DATE
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE messages
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id         INT AUTO_INCREMENT PRIMARY KEY,
     user_id    INT,
     room_id    INT,
     message    TEXT,
-    create_time DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (room_id) REFERENCES rooms (id)
 );

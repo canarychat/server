@@ -70,7 +70,7 @@ class MainServer : public Poco::Util::ServerApplication {
   void initialize(Application &self) {
     loadConfiguration(); // load default configuration files, if present
     ServerApplication::initialize(self);
-    std::string pattern = config().getString("MainServer.logPattern","[%p] - %Y-%m-%d %H:%M:%S (%O:%u) %t");
+    std::string pattern = config().getString("MainServer.logPattern","[%p] -%J- %Y-%m-%d %H:%M:%S (%O:%u) %t");
     auto* pPF = new Poco::PatternFormatter(pattern);
     auto* pCC = new Poco::ConsoleChannel;
     auto* pFC = new Poco::FormattingChannel(pPF,pCC);
@@ -121,7 +121,7 @@ class MainServer : public Poco::Util::ServerApplication {
     } else {
       unsigned short port = (unsigned short) config().getInt("MainServer.port", 12300);
       std::string format(config().getString("MainServer.format", DateTimeFormat::SORTABLE_FORMAT));
-      ThreadPool::defaultPool();
+      ThreadPool::defaultPool().addCapacity(config().getInt("MainServer.threadPoolCapacity", 16));
       waitForTerminationRequest();
     }
     return Application::EXIT_OK;
