@@ -1,0 +1,31 @@
+<project namespace="ChatRoomDB">
+    <class name="User" table="users">
+        <property name="id" type="int32" autoIncrement="true"/>
+        <property name="username" type="string"/>
+        <property name="password" type="string"/>
+        <property name="email" type="string"/>
+        <property name="created_at" type="timestamp"/>
+        <property name="updated_at" type="timestamp"/>
+    </class>
+
+    <class name="Room" table="rooms">
+        <property name="id" type="int32" autoIncrement="true"/>
+        <property name="name" type="string"/>
+        <property name="created_at" type="timestamp"/>
+        <property name="updated_at" type="timestamp"/>
+    </class>
+
+    <class name="UserRoomRelation" table="user_room_relation">
+        <property name="user_id" type="int32" references="User"/>
+        <property name="room_id" type="int32" references="Room"/>
+        <property name="joined_at" type="timestamp"/>
+    </class>
+
+    <class name="Message" table="messages">
+        <property name="id" type="int32" autoIncrement="true"/>
+        <property name="user_id" type="int32" references="User"/>
+        <property name="room_id" type="int32" references="Room"/>
+        <property name="message" type="string"/>
+        <property name="created_at" type="timestamp"/>
+    </class>
+</project>
