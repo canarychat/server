@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>登录页面</title>
+</head>
+<body>
+<form id="loginForm">
+  <label for="usernameOrId">用户名或ID:</label><br>
+  <input type="text" id="usernameOrId" name="usernameOrId"><br>
+  <label for="password">密码:</label><br>
+  <input type="password" id="password" name="password"><br>
+  <input type="submit" value="登录">
+</form>
+<p id="message"></p>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    var usernameOrId = document.getElementById('usernameOrId').value;
+    var password = document.getElementById('password').value;
+    var id = isNaN(usernameOrId) ? 0 : parseInt(usernameOrId);
+    var username = isNaN(usernameOrId) ? usernameOrId : '';
+
+    fetch('http://localhost/api/v1/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "username": username,
+        "password": password,
+        "id": id
+      })
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.code === 0) {
+                document.getElementById('message').innerText = '登录成功';
+              } else {
+                document.getElementById('message').innerText = '登录失败：' + data.msg;
+              }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+  });
+</script>
+</body>
+</html>
