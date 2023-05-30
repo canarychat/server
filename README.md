@@ -11,7 +11,10 @@ I'm learning poco library, so I make this as a practice.
 
 ## Install
 
-
+You should install POCO first
+```bash
+sudo apt-get install poco
+```
 
 ## Usage
 
