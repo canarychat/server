@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+</head>
+<body>
+<form id="registerForm">
+    <label for="username">用户名:</label><br>
+    <input type="text" id="username" name="username"><br>
+    <label for="password">密码:</label><br>
+    <input type="password" id="password" name="password"><br>
+    <label for="email">邮箱:</label><br>
+    <input type="email" id="email" name="email"><br>
+    <input type="submit" value="注册">
+</form>
+<p id="message"></p>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        var email = document.getElementById('email').value;
+
+        fetch('http://localhost/api/v1/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "username": username,
+                "password": password,
+                "email": email
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = '注册成功，你的用户ID是：' + data.data.id;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+</body>
+</html>
