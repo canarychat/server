@@ -65,6 +65,19 @@ struct RouteKey {
 using Route = std::pair<RouteKey, std::function<void(HTTPServerRequest &, HTTPServerResponse &)>>;
 
 inline std::vector<Route> routeTable{
+    //CORS
+    {
+        {"OPTIONS", std::regex("/.*")},
+        [](HTTPServerRequest& request, HTTPServerResponse& response) {
+          // 设置CORS响应头
+          response.add("Access-Control-Allow-Origin", "*");  // 这里你也可以设置为你的前端域名，而不是'*'
+          response.add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
+          response.add("Access-Control-Allow-Headers", "Content-Type");
+
+          response.send();
+        }
+    },
+
     // Register
     {{"POST", std::regex("/register")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
