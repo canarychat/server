@@ -7,12 +7,20 @@
 
 void ChatHttpSubSystem::initialize(Application &app) {// 子系统的初始化逻辑
   app.logger().information("ChatHttpSubSystem Init");
-  auto port = app.config().getInt("MainServer.port", 8080);
+  auto port = app.config().getInt("MainServer.port", 12300);
   p_server_socket_ = new Poco::Net::ServerSocket(port);
   p_factory_ = new ChatHTTPRequestHandlerFactory();
   p_params_ = new Poco::Net::HTTPServerParams();
+
+  //set params
+  auto thread_number = app.config().getInt("MainServer.threadNumber", 16);
+  p_params_->setMaxThreads(16);
+  p_params_->setMaxQueued(64);
+  p_params_->setThreadIdleTime(100);
+
   p_server_ = new Poco::Net::HTTPServer(p_factory_, *p_server_socket_, p_params_);
   p_server_->start();
+  poco_information_f1(app.logger(), "ChatHttpSubSystem start at %d", port);
 }
 void ChatHttpSubSystem::uninitialize() {
   // 子系统的清理逻辑
