@@ -1,31 +1,31 @@
 <project namespace="ChatRoomDB">
-    <class name="User" table="users">
-        <property name="id" type="int32" autoIncrement="true"/>
+    <class name="User" table="users"  autoIncrementID="true">
+        <property name="id" type="int32"/>
         <property name="username" type="string"/>
         <property name="password" type="string"/>
         <property name="email" type="string"/>
-        <property name="created_at" type="timestamp"/>
-        <property name="updated_at" type="timestamp"/>
+        <property name="create_time" type="date"/>
+        <property name="update_time" type="date"/>
     </class>
 
-    <class name="Room" table="rooms">
-        <property name="id" type="int32" autoIncrement="true"/>
+    <class name="Room" table="rooms" autoIncrementID="true">
+        <property name="id" type="int32"/>
         <property name="name" type="string"/>
-        <property name="created_at" type="timestamp"/>
-        <property name="updated_at" type="timestamp"/>
+        <property name="create_time" type="date"/>
+        <property name="update_time" type="date"/>
     </class>
 
     <class name="UserRoomRelation" table="user_room_relation">
         <property name="user_id" type="int32" references="User"/>
         <property name="room_id" type="int32" references="Room"/>
-        <property name="joined_at" type="timestamp"/>
+        <property name="joined_at" type="date"/>
     </class>
 
-    <class name="Message" table="messages">
-        <property name="id" type="int32" autoIncrement="true"/>
+    <class name="Message" table="messages" autoIncrementID="true">
+        <property name="id" type="int64"/>
         <property name="user_id" type="int32" references="User"/>
         <property name="room_id" type="int32" references="Room"/>
         <property name="message" type="string"/>
-        <property name="created_at" type="timestamp"/>
+        <property name="create_time" type="date"/>
     </class>
 </project>

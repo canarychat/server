@@ -10,8 +10,8 @@
 
 
 #include "Poco/ActiveRecord/ActiveRecord.h"
-#include "User.h"
-#include "Room.h"
+#include "ChatRoomDB/User.h"
+#include "ChatRoomDB/Room.h"
 
 
 namespace ChatRoomDB {
@@ -26,8 +26,8 @@ public:
 	UserRoomRelation(const UserRoomRelation& other);
 	~UserRoomRelation() = default;
 
-	const Poco::Timestamp& joined_at() const;
-	UserRoomRelation& joined_at(const Poco::Timestamp& value);
+	const Poco::Data::Date& joined_at() const;
+	UserRoomRelation& joined_at(const Poco::Data::Date& value);
 
 	User::Ptr user_id() const;
 	Poco::Int32 user_idID() const;
@@ -49,19 +49,19 @@ public:
 private:
 	Poco::Int32 _user_id = User::INVALID_ID;
 	Poco::Int32 _room_id = Room::INVALID_ID;
-	Poco::Timestamp _joined_at;
+	Poco::Data::Date _joined_at;
 
 	friend class Poco::Data::TypeHandler<UserRoomRelation>;
 };
 
 
-inline const Poco::Timestamp& UserRoomRelation::joined_at() const
+inline const Poco::Data::Date& UserRoomRelation::joined_at() const
 {
 	return _joined_at;
 }
 
 
-inline UserRoomRelation& UserRoomRelation::joined_at(const Poco::Timestamp& value)
+inline UserRoomRelation& UserRoomRelation::joined_at(const Poco::Data::Date& value)
 {
 	_joined_at = value;
 	return *this;
@@ -114,21 +114,21 @@ public:
 	{
 		TypeHandler<Poco::Int32>::bind(pos++, ar._user_id, pBinder, dir);
 		TypeHandler<Poco::Int32>::bind(pos++, ar._room_id, pBinder, dir);
-		TypeHandler<Poco::Timestamp>::bind(pos++, ar._joined_at, pBinder, dir);
+		TypeHandler<Poco::Data::Date>::bind(pos++, ar._joined_at, pBinder, dir);
 }
 
 	static void extract(std::size_t pos, ChatRoomDB::UserRoomRelation& ar, const ChatRoomDB::UserRoomRelation& deflt, AbstractExtractor::Ptr pExtr)
 	{
 		TypeHandler<Poco::Int32>::extract(pos++, ar._user_id, deflt._user_id, pExtr);
 		TypeHandler<Poco::Int32>::extract(pos++, ar._room_id, deflt._room_id, pExtr);
-		TypeHandler<Poco::Timestamp>::extract(pos++, ar._joined_at, deflt._joined_at, pExtr);
+		TypeHandler<Poco::Data::Date>::extract(pos++, ar._joined_at, deflt._joined_at, pExtr);
 }
 
 	static void prepare(std::size_t pos, const ChatRoomDB::UserRoomRelation& ar, AbstractPreparator::Ptr pPrep)
 	{
 		TypeHandler<Poco::Int32>::prepare(pos++, ar._user_id, pPrep);
 		TypeHandler<Poco::Int32>::prepare(pos++, ar._room_id, pPrep);
-		TypeHandler<Poco::Timestamp>::prepare(pos++, ar._joined_at, pPrep);
+		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._joined_at, pPrep);
 	}
 };
 

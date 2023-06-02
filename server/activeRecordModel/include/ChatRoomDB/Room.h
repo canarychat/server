@@ -28,11 +28,11 @@ public:
 	const std::string& name() const;
 	Room& name(const std::string& value);
 
-	const Poco::Timestamp& created_at() const;
-	Room& created_at(const Poco::Timestamp& value);
+	const Poco::Data::Date& create_time() const;
+	Room& create_time(const Poco::Data::Date& value);
 
-	const Poco::Timestamp& updated_at() const;
-	Room& updated_at(const Poco::Timestamp& value);
+	const Poco::Data::Date& update_time() const;
+	Room& update_time(const Poco::Data::Date& value);
 
 	static Ptr find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id);
 
@@ -45,8 +45,8 @@ public:
 
 private:
 	std::string _name;
-	Poco::Timestamp _created_at;
-	Poco::Timestamp _updated_at;
+	Poco::Data::Date _create_time;
+	Poco::Data::Date _update_time;
 
 	friend class Poco::Data::TypeHandler<Room>;
 };
@@ -65,28 +65,28 @@ inline Room& Room::name(const std::string& value)
 }
 
 
-inline const Poco::Timestamp& Room::created_at() const
+inline const Poco::Data::Date& Room::create_time() const
 {
-	return _created_at;
+	return _create_time;
 }
 
 
-inline Room& Room::created_at(const Poco::Timestamp& value)
+inline Room& Room::create_time(const Poco::Data::Date& value)
 {
-	_created_at = value;
+	_create_time = value;
 	return *this;
 }
 
 
-inline const Poco::Timestamp& Room::updated_at() const
+inline const Poco::Data::Date& Room::update_time() const
 {
-	return _updated_at;
+	return _update_time;
 }
 
 
-inline Room& Room::updated_at(const Poco::Timestamp& value)
+inline Room& Room::update_time(const Poco::Data::Date& value)
 {
-	_updated_at = value;
+	_update_time = value;
 	return *this;
 }
 
@@ -110,22 +110,22 @@ public:
 	static void bind(std::size_t pos, const ChatRoomDB::Room& ar, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		TypeHandler<std::string>::bind(pos++, ar._name, pBinder, dir);
-		TypeHandler<Poco::Timestamp>::bind(pos++, ar._created_at, pBinder, dir);
-		TypeHandler<Poco::Timestamp>::bind(pos++, ar._updated_at, pBinder, dir);
+		TypeHandler<Poco::Data::Date>::bind(pos++, ar._create_time, pBinder, dir);
+		TypeHandler<Poco::Data::Date>::bind(pos++, ar._update_time, pBinder, dir);
 }
 
 	static void extract(std::size_t pos, ChatRoomDB::Room& ar, const ChatRoomDB::Room& deflt, AbstractExtractor::Ptr pExtr)
 	{
 		TypeHandler<std::string>::extract(pos++, ar._name, deflt._name, pExtr);
-		TypeHandler<Poco::Timestamp>::extract(pos++, ar._created_at, deflt._created_at, pExtr);
-		TypeHandler<Poco::Timestamp>::extract(pos++, ar._updated_at, deflt._updated_at, pExtr);
+		TypeHandler<Poco::Data::Date>::extract(pos++, ar._create_time, deflt._create_time, pExtr);
+		TypeHandler<Poco::Data::Date>::extract(pos++, ar._update_time, deflt._update_time, pExtr);
 }
 
 	static void prepare(std::size_t pos, const ChatRoomDB::Room& ar, AbstractPreparator::Ptr pPrep)
 	{
 		TypeHandler<std::string>::prepare(pos++, ar._name, pPrep);
-		TypeHandler<Poco::Timestamp>::prepare(pos++, ar._created_at, pPrep);
-		TypeHandler<Poco::Timestamp>::prepare(pos++, ar._updated_at, pPrep);
+		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._create_time, pPrep);
+		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._update_time, pPrep);
 	}
 };
 

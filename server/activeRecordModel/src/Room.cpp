@@ -1,11 +1,11 @@
 //
-// User.cpp
+// Room.cpp
 //
 // This file has been generated from db.xml. Do not edit.
 //
 
 
-#include "User.h"
+#include "ChatRoomDB/Room.h"
 
 
 using namespace std::string_literals;
@@ -15,31 +15,29 @@ using namespace Poco::Data::Keywords;
 namespace ChatRoomDB {
 
 
-User::User(ID id):
+Room::Room(ID id):
 	Poco::ActiveRecord::ActiveRecord<Poco::Int32>(id)
 {
 }
 
 
-User::User(const User& other):
+Room::Room(const Room& other):
 	Poco::ActiveRecord::ActiveRecord<Poco::Int32>(other),
-	_username(other._username),
-	_password(other._password),
-	_email(other._email),
-	_created_at(other._created_at),
-	_updated_at(other._updated_at)
+	_name(other._name),
+	_create_time(other._create_time),
+	_update_time(other._update_time)
 {
 }
 
 
-User::Ptr User::find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id)
+Room::Ptr Room::find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id)
 {
 	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(pContext->statementPlaceholderProvider());
-	User::Ptr pObject(new User);
+	Room::Ptr pObject(new Room);
 
 	pContext->session()
-		<< "SELECT id, username, password, email, created_at, updated_at"
-		<< "  FROM users"
+		<< "SELECT id, name, create_time, update_time"
+		<< "  FROM rooms"
 		<< "  WHERE id = " << pSPP->next(),
 		into(pObject->mutableID()),
 		into(*pObject),
@@ -50,26 +48,26 @@ User::Ptr User::find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id)
 }
 
 
-void User::insert()
+void Room::insert()
 {
 	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
 	context()->session()
-		<< "INSERT INTO users (id, username, password, email, created_at, updated_at)"
-		<< "  VALUES (" << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
-		bind(id()),
+		<< "INSERT INTO rooms (id, name, create_time, update_time)"
+		<< "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
 		use(*this),
 		now;
+	updateID(context()->session());
 }
 
 
-void User::update()
+void Room::update()
 {
 	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
 	context()->session()
-		<< "UPDATE users"
-		<< "  SET username = " << pSPP->next() << ", password = " << pSPP->next() << ", email = " << pSPP->next() << ", created_at = " << pSPP->next() << ", updated_at = " << pSPP->next()
+		<< "UPDATE rooms"
+		<< "  SET name = " << pSPP->next() << ", create_time = " << pSPP->next() << ", update_time = " << pSPP->next()
 		<< "  WHERE id = " << pSPP->next(),
 		use(*this),
 		bind(id()),
@@ -77,37 +75,35 @@ void User::update()
 }
 
 
-void User::remove()
+void Room::remove()
 {
 	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
 	context()->session()
-		<< "DELETE FROM users"
+		<< "DELETE FROM rooms"
 		<< "  WHERE id = " << pSPP->next(),
 		bind(id()),
 		now;
 }
 
 
-const std::vector<std::string>& User::columns()
+const std::vector<std::string>& Room::columns()
 {
 	static const std::vector<std::string> cols =
 	{
 		"id"s,
-		"username"s,
-		"password"s,
-		"email"s,
-		"created_at"s,
-		"updated_at"s,
+		"name"s,
+		"create_time"s,
+		"update_time"s,
 	};
 
 	return cols;
 }
 
 
-const std::string& User::table()
+const std::string& Room::table()
 {
-	static const std::string t = "users";
+	static const std::string t = "rooms";
 	return t;
 }
 
