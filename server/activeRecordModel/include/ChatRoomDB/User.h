@@ -31,11 +31,8 @@ public:
 	const std::string& password() const;
 	User& password(const std::string& value);
 
-	const std::string& salt() const;
-	User& salt(const std::string& value);
-
-	const Poco::Nullable<std::string>& email() const;
-	User& email(const Poco::Nullable<std::string>& value);
+	const std::string& email() const;
+	User& email(const std::string& value);
 
 	const Poco::Data::Date& create_time() const;
 	User& create_time(const Poco::Data::Date& value);
@@ -55,8 +52,7 @@ public:
 private:
 	std::string _username;
 	std::string _password;
-	std::string _salt;
-	Poco::Nullable<std::string> _email;
+	std::string _email;
 	Poco::Data::Date _create_time;
 	Poco::Data::Date _update_time;
 
@@ -90,26 +86,13 @@ inline User& User::password(const std::string& value)
 }
 
 
-inline const std::string& User::salt() const
-{
-	return _salt;
-}
-
-
-inline User& User::salt(const std::string& value)
-{
-	_salt = value;
-	return *this;
-}
-
-
-inline const Poco::Nullable<std::string>& User::email() const
+inline const std::string& User::email() const
 {
 	return _email;
 }
 
 
-inline User& User::email(const Poco::Nullable<std::string>& value)
+inline User& User::email(const std::string& value)
 {
 	_email = value;
 	return *this;
@@ -155,15 +138,14 @@ class TypeHandler<ChatRoomDB::User>
 public:
 	static std::size_t size()
 	{
-		return 6;
+		return 5;
 	}
 
 	static void bind(std::size_t pos, const ChatRoomDB::User& ar, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		TypeHandler<std::string>::bind(pos++, ar._username, pBinder, dir);
 		TypeHandler<std::string>::bind(pos++, ar._password, pBinder, dir);
-		TypeHandler<std::string>::bind(pos++, ar._salt, pBinder, dir);
-		TypeHandler<Poco::Nullable<std::string>>::bind(pos++, ar._email, pBinder, dir);
+		TypeHandler<std::string>::bind(pos++, ar._email, pBinder, dir);
 		TypeHandler<Poco::Data::Date>::bind(pos++, ar._create_time, pBinder, dir);
 		TypeHandler<Poco::Data::Date>::bind(pos++, ar._update_time, pBinder, dir);
 }
@@ -172,8 +154,7 @@ public:
 	{
 		TypeHandler<std::string>::extract(pos++, ar._username, deflt._username, pExtr);
 		TypeHandler<std::string>::extract(pos++, ar._password, deflt._password, pExtr);
-		TypeHandler<std::string>::extract(pos++, ar._salt, deflt._salt, pExtr);
-		TypeHandler<Poco::Nullable<std::string>>::extract(pos++, ar._email, deflt._email, pExtr);
+		TypeHandler<std::string>::extract(pos++, ar._email, deflt._email, pExtr);
 		TypeHandler<Poco::Data::Date>::extract(pos++, ar._create_time, deflt._create_time, pExtr);
 		TypeHandler<Poco::Data::Date>::extract(pos++, ar._update_time, deflt._update_time, pExtr);
 }
@@ -182,8 +163,7 @@ public:
 	{
 		TypeHandler<std::string>::prepare(pos++, ar._username, pPrep);
 		TypeHandler<std::string>::prepare(pos++, ar._password, pPrep);
-		TypeHandler<std::string>::prepare(pos++, ar._salt, pPrep);
-		TypeHandler<Poco::Nullable<std::string>>::prepare(pos++, ar._email, pPrep);
+		TypeHandler<std::string>::prepare(pos++, ar._email, pPrep);
 		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._create_time, pPrep);
 		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._update_time, pPrep);
 	}

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "const.h"
-
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/ServerSocket.h"
@@ -48,23 +46,6 @@
 #include "Poco/Util/Subsystem.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Notification.h"
-#include "Poco/Exception.h"
-#include "Poco/Crypto/DigestEngine.h"
-#include <Poco/RandomStream.h>
-#include <Poco/HexBinaryEncoder.h>
-#include <Poco/HexBinaryDecoder.h>
-#include <Poco/Base64Decoder.h>
-#include <Poco/Base64Encoder.h>
-#include <Poco/JWT/Token.h>
-#include <Poco/JWT/Signer.h>
-#include <Poco/JWT/Serializer.h>
-#include <Poco/Data/Session.h>
-#include <Poco/Data/MySQL/Connector.h>
-#include <Poco/Data/RecordSet.h>
-#include <Poco/Data/Statement.h>
-#include <Poco/Data/SessionPool.h>
-#include <Poco/Environment.h>
-
 
 
 using namespace Poco::Net;
@@ -88,5 +69,3 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 using Poco::ActiveRecord::Context;
 using Poco::ActiveRecord::Query;
-
-using std::string;

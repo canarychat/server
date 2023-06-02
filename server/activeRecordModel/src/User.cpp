@@ -25,7 +25,6 @@ User::User(const User& other):
 	Poco::ActiveRecord::ActiveRecord<Poco::Int32>(other),
 	_username(other._username),
 	_password(other._password),
-	_salt(other._salt),
 	_email(other._email),
 	_create_time(other._create_time),
 	_update_time(other._update_time)
@@ -39,7 +38,7 @@ User::Ptr User::find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id)
 	User::Ptr pObject(new User);
 
 	pContext->session()
-		<< "SELECT id, username, password, salt, email, create_time, update_time"
+		<< "SELECT id, username, password, email, create_time, update_time"
 		<< "  FROM users"
 		<< "  WHERE id = " << pSPP->next(),
 		into(pObject->mutableID()),
@@ -56,8 +55,8 @@ void User::insert()
 	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
 	context()->session()
-		<< "INSERT INTO users (id, username, password, salt, email, create_time, update_time)"
-		<< "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
+		<< "INSERT INTO users (id, username, password, email, create_time, update_time)"
+		<< "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
 		use(*this),
 		now;
 	updateID(context()->session());
@@ -70,7 +69,7 @@ void User::update()
 
 	context()->session()
 		<< "UPDATE users"
-		<< "  SET username = " << pSPP->next() << ", password = " << pSPP->next() << ", salt = " << pSPP->next() << ", email = " << pSPP->next() << ", create_time = " << pSPP->next() << ", update_time = " << pSPP->next()
+		<< "  SET username = " << pSPP->next() << ", password = " << pSPP->next() << ", email = " << pSPP->next() << ", create_time = " << pSPP->next() << ", update_time = " << pSPP->next()
 		<< "  WHERE id = " << pSPP->next(),
 		use(*this),
 		bind(id()),
@@ -97,7 +96,6 @@ const std::vector<std::string>& User::columns()
 		"id"s,
 		"username"s,
 		"password"s,
-		"salt"s,
 		"email"s,
 		"create_time"s,
 		"update_time"s,

@@ -8,16 +8,16 @@ CREATE TABLE users
     username   VARCHAR(255) NOT NULL,
     password   VARCHAR(255) NOT NULL,
     email      VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    create_time DATE DEFAULT CURRENT_DATE,
+    update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE rooms
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    create_time DATE DEFAULT CURRENT_DATE,
+    update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE user_room_relation
@@ -27,7 +27,7 @@ CREATE TABLE user_room_relation
     PRIMARY KEY (user_id, room_id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (room_id) REFERENCES rooms (id),
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    joined_at DATE DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE messages
@@ -36,7 +36,7 @@ CREATE TABLE messages
     user_id    INT,
     room_id    INT,
     message    TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    create_time DATE DEFAULT CURRENT_DATE,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (room_id) REFERENCES rooms (id)
 );
