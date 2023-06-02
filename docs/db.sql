@@ -4,17 +4,18 @@ USE ChatRoomDB;
 
 CREATE TABLE users
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
-    username   VARCHAR(255) NOT NULL,
+    id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    username   VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
-    email      VARCHAR(255),
+    salt       CHAR(32) NOT NULL,
+    email      VARCHAR(255) UNIQUE ,
     create_time DATE DEFAULT CURRENT_DATE,
     update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
 
 CREATE TABLE rooms
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE,
     name       VARCHAR(255) NOT NULL,
     create_time DATE DEFAULT CURRENT_DATE,
     update_time DATE DEFAULT CURRENT_DATE

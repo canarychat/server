@@ -30,10 +30,30 @@ Poco::JSON::Object::Ptr DataManager::registerUser(const std::string &username,
         p_user->username(username).password(password).email(email);
         p_user->create(p_context_);
     }
+    catch (Poco::IOException &e) {
+        std::string errMsg = e.displayText();
+        if (errMsg.find("key \'username\'") != std::string::npos) {
+            poco_information(Application::instance().logger(), "Username already exists");
+            respond_json->set("code", static_cast<int>(state_code::REGISTRATION_NICKNAME_EXISTS));
+            return respond_json;
+        }
+        else if (errMsg.find("key \'email\'") != std::string::npos) {
+            poco_information(Application::instance().logger(), "Email already exists");
+            respond_json->set("code", static_cast<int>(state_code::REGISTRATION_EMAIL_EXISTS));
+            return respond_json;
+        }
+        else {
+            poco_information(Application::instance().logger(), e.displayText());
+            respond_json->set("code", static_cast<int>(state_code::REGISTRATION_SERVER_ERROR));
+            return respond_json;
+        }
+    }
     catch (Poco::Exception &e) {
         poco_error(Application::instance().logger(), e.displayText());
         respond_json->set("code", static_cast<int>(state_code::REGISTRATION_SERVER_ERROR));
+        return  respond_json;
     }
+
     Poco::JSON::Object::Ptr data_json = new Poco::JSON::Object;
     poco_trace_f3 (Application::instance().logger(), "id = %d, username = %s, email = %s", p_user->id(), p_user->username(), p_user->email());
     data_json->set("id", p_user->id());
