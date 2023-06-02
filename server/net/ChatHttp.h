@@ -55,3 +55,10 @@ class ChatHTTPRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactor
     return new ChatHTTPRequestHandler;
   }
 };
+
+ class RequestNotification: public Poco::Notification{
+  public:
+    RequestNotification(HTTPServerRequest& request, HTTPServerResponse& response):request_(request),response_(response){}
+    HTTPServerRequest& request_;
+    HTTPServerResponse& response_;
+ };

@@ -40,7 +40,7 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
   for (const auto &route : routeTable) {
     std::regex route_regex(route.first.pattern);
     std::smatch match_result;
-    if (std::regex_match(request_uri, match_result, route_regex)) {
+    if (route.first.requestType==request_method&& std::regex_match(request_uri, match_result, route_regex)) {
       route.second(request, response);
       return;
     }

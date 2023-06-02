@@ -10,14 +10,14 @@
 
 
 #include "Poco/ActiveRecord/ActiveRecord.h"
-#include "User.h"
-#include "Room.h"
+#include "ChatRoomDB/User.h"
+#include "ChatRoomDB/Room.h"
 
 
 namespace ChatRoomDB {
 
 
-class Message: public Poco::ActiveRecord::ActiveRecord<Poco::Int32>
+class Message: public Poco::ActiveRecord::ActiveRecord<Poco::Int64>
 {
 public:
 	using Ptr = Poco::AutoPtr<Message>;
@@ -30,8 +30,8 @@ public:
 	const std::string& message() const;
 	Message& message(const std::string& value);
 
-	const Poco::Timestamp& created_at() const;
-	Message& created_at(const Poco::Timestamp& value);
+	const Poco::Data::Date& create_time() const;
+	Message& create_time(const Poco::Data::Date& value);
 
 	User::Ptr user_id() const;
 	Poco::Int32 user_idID() const;
@@ -56,7 +56,7 @@ private:
 	Poco::Int32 _user_id = User::INVALID_ID;
 	Poco::Int32 _room_id = Room::INVALID_ID;
 	std::string _message;
-	Poco::Timestamp _created_at;
+	Poco::Data::Date _create_time;
 
 	friend class Poco::Data::TypeHandler<Message>;
 };
@@ -75,15 +75,15 @@ inline Message& Message::message(const std::string& value)
 }
 
 
-inline const Poco::Timestamp& Message::created_at() const
+inline const Poco::Data::Date& Message::create_time() const
 {
-	return _created_at;
+	return _create_time;
 }
 
 
-inline Message& Message::created_at(const Poco::Timestamp& value)
+inline Message& Message::create_time(const Poco::Data::Date& value)
 {
-	_created_at = value;
+	_create_time = value;
 	return *this;
 }
 
@@ -135,7 +135,7 @@ public:
 		TypeHandler<Poco::Int32>::bind(pos++, ar._user_id, pBinder, dir);
 		TypeHandler<Poco::Int32>::bind(pos++, ar._room_id, pBinder, dir);
 		TypeHandler<std::string>::bind(pos++, ar._message, pBinder, dir);
-		TypeHandler<Poco::Timestamp>::bind(pos++, ar._created_at, pBinder, dir);
+		TypeHandler<Poco::Data::Date>::bind(pos++, ar._create_time, pBinder, dir);
 }
 
 	static void extract(std::size_t pos, ChatRoomDB::Message& ar, const ChatRoomDB::Message& deflt, AbstractExtractor::Ptr pExtr)
@@ -143,7 +143,7 @@ public:
 		TypeHandler<Poco::Int32>::extract(pos++, ar._user_id, deflt._user_id, pExtr);
 		TypeHandler<Poco::Int32>::extract(pos++, ar._room_id, deflt._room_id, pExtr);
 		TypeHandler<std::string>::extract(pos++, ar._message, deflt._message, pExtr);
-		TypeHandler<Poco::Timestamp>::extract(pos++, ar._created_at, deflt._created_at, pExtr);
+		TypeHandler<Poco::Data::Date>::extract(pos++, ar._create_time, deflt._create_time, pExtr);
 }
 
 	static void prepare(std::size_t pos, const ChatRoomDB::Message& ar, AbstractPreparator::Ptr pPrep)
@@ -151,7 +151,7 @@ public:
 		TypeHandler<Poco::Int32>::prepare(pos++, ar._user_id, pPrep);
 		TypeHandler<Poco::Int32>::prepare(pos++, ar._room_id, pPrep);
 		TypeHandler<std::string>::prepare(pos++, ar._message, pPrep);
-		TypeHandler<Poco::Timestamp>::prepare(pos++, ar._created_at, pPrep);
+		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._create_time, pPrep);
 	}
 };
 
