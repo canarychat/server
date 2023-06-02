@@ -46,6 +46,9 @@
 #include "Poco/Util/Subsystem.h"
 #include "Poco/NotificationCenter.h"
 #include "Poco/Notification.h"
+#include "Poco/Exception.h"
+#include "Poco/Crypto/DigestEngine.h"
+#include <Poco/Crypto/
 
 
 using namespace Poco::Net;

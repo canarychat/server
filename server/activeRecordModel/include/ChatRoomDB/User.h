@@ -31,6 +31,9 @@ public:
 	const std::string& password() const;
 	User& password(const std::string& value);
 
+	const std::string& salt() const;
+	User& salt(const std::string& value);
+
 	const std::string& email() const;
 	User& email(const std::string& value);
 
@@ -52,6 +55,7 @@ public:
 private:
 	std::string _username;
 	std::string _password;
+	std::string _salt;
 	std::string _email;
 	Poco::Data::Date _create_time;
 	Poco::Data::Date _update_time;
@@ -82,6 +86,19 @@ inline const std::string& User::password() const
 inline User& User::password(const std::string& value)
 {
 	_password = value;
+	return *this;
+}
+
+
+inline const std::string& User::salt() const
+{
+	return _salt;
+}
+
+
+inline User& User::salt(const std::string& value)
+{
+	_salt = value;
 	return *this;
 }
 
@@ -138,13 +155,14 @@ class TypeHandler<ChatRoomDB::User>
 public:
 	static std::size_t size()
 	{
-		return 5;
+		return 6;
 	}
 
 	static void bind(std::size_t pos, const ChatRoomDB::User& ar, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		TypeHandler<std::string>::bind(pos++, ar._username, pBinder, dir);
 		TypeHandler<std::string>::bind(pos++, ar._password, pBinder, dir);
+		TypeHandler<std::string>::bind(pos++, ar._salt, pBinder, dir);
 		TypeHandler<std::string>::bind(pos++, ar._email, pBinder, dir);
 		TypeHandler<Poco::Data::Date>::bind(pos++, ar._create_time, pBinder, dir);
 		TypeHandler<Poco::Data::Date>::bind(pos++, ar._update_time, pBinder, dir);
@@ -154,6 +172,7 @@ public:
 	{
 		TypeHandler<std::string>::extract(pos++, ar._username, deflt._username, pExtr);
 		TypeHandler<std::string>::extract(pos++, ar._password, deflt._password, pExtr);
+		TypeHandler<std::string>::extract(pos++, ar._salt, deflt._salt, pExtr);
 		TypeHandler<std::string>::extract(pos++, ar._email, deflt._email, pExtr);
 		TypeHandler<Poco::Data::Date>::extract(pos++, ar._create_time, deflt._create_time, pExtr);
 		TypeHandler<Poco::Data::Date>::extract(pos++, ar._update_time, deflt._update_time, pExtr);
@@ -163,6 +182,7 @@ public:
 	{
 		TypeHandler<std::string>::prepare(pos++, ar._username, pPrep);
 		TypeHandler<std::string>::prepare(pos++, ar._password, pPrep);
+		TypeHandler<std::string>::prepare(pos++, ar._salt, pPrep);
 		TypeHandler<std::string>::prepare(pos++, ar._email, pPrep);
 		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._create_time, pPrep);
 		TypeHandler<Poco::Data::Date>::prepare(pos++, ar._update_time, pPrep);

@@ -3,6 +3,7 @@
         <property name="id" type="int32"/>
         <property name="username" type="string"/>
         <property name="password" type="string"/>
+        <property name="salt" type="string"/>
         <property name="email" type="string"/>
         <property name="create_time" type="date"/>
         <property name="update_time" type="date"/>
