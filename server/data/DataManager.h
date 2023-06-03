@@ -27,6 +27,8 @@ class DataManager : public Subsystem {
 
   //功能函数
   Poco::JSON::Object::Ptr registerUser(const std::string& username, const std::string& password, const std::string& email="");
+
+    Poco::JSON::Object::Ptr loginUser(const std::string& username, const int &user_id, const std::string& password);
  private:
     // 数据库连接
     std::unique_ptr<Poco::Data::Session> p_session_;
