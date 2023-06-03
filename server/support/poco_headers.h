@@ -48,7 +48,11 @@
 #include "Poco/Notification.h"
 #include "Poco/Exception.h"
 #include "Poco/Crypto/DigestEngine.h"
-#include <Poco/Crypto/
+#include <Poco/RandomStream.h>
+#include <Poco/HexBinaryEncoder.h>
+#include <Poco/HexBinaryDecoder.h>
+#include <Poco/Base64Decoder.h>
+#include <Poco/Base64Encoder.h>
 
 
 using namespace Poco::Net;
@@ -72,3 +76,5 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 using Poco::ActiveRecord::Context;
 using Poco::ActiveRecord::Query;
+
+using std::string;

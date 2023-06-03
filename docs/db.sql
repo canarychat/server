@@ -8,7 +8,7 @@ CREATE TABLE users
     username   VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     salt       CHAR(32) NOT NULL,
-    email      VARCHAR(255) UNIQUE ,
+    email      VARCHAR(255) UNIQUE NULL,
     create_time DATE DEFAULT CURRENT_DATE,
     update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
@@ -33,7 +33,7 @@ CREATE TABLE user_room_relation
 
 CREATE TABLE messages
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id    INT,
     room_id    INT,
     message    TEXT,

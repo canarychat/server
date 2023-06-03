@@ -16,14 +16,14 @@ struct RouteKey {
   std::regex pattern;
 };
 using Route = std::pair<RouteKey, std::function<void(HTTPServerRequest &, HTTPServerResponse &)>>;
-inline DataManager& DM_instance() {
-    return Poco::Util::Application::instance().getSubsystem<DataManager>();
+inline DataManager &DM_instance() {
+  return Poco::Util::Application::instance().getSubsystem<DataManager>();
 }
 inline std::vector<Route> routeTable{
     //CORS
     {
         {"OPTIONS", std::regex("/.*")},
-        [](HTTPServerRequest& request, HTTPServerResponse& response) {
+        [](HTTPServerRequest &request, HTTPServerResponse &response) {
           // 设置CORS响应头
 //          poco_debug_f1(Application::instance().logger(), "request.getURI() = %s", request.getURI());
           response.add("Access-Control-Allow-Origin", "*");  // 这里你也可以设置为你的前端域名，而不是'*'
@@ -36,28 +36,38 @@ inline std::vector<Route> routeTable{
     // Register
     {{"POST", std::regex("/register")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
-       poco_debug_f1(Application::instance().logger(),"request.getURI() = %s", request.getURI());
+       poco_debug_f1(Application::instance().logger(), "request.getURI() = %s", request.getURI());
        response.add("Access-Control-Allow-Origin", "*");
        response.setContentType("application/json");
 
        std::ostream &ostr = response.send();
 
        Poco::JSON::Parser parser;
-         auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
+       auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
 
-         // 处理JSON数据...
-         std::string username = res->getValue<std::string>("username");
+       // 处理JSON数据...
+       auto username = res->getValue<std::string>("username");
+       auto password = res->getValue<std::string>("password");
+       auto email = res->getValue<std::string>("email");
 
-       auto json = DM_instance().registerUser(res->getValue<std::string>("username"), res->getValue<std::string>("password"), res->getValue<std::string>("email"));
-//       std::ostringstream oss;
-//       json->stringify(oss);
-//       poco_debug_f1(Application::instance().logger(),"oss = %s", oss.str());
-       json->stringify(ostr);
+       if (username.empty() || password.empty()) {
+         response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+         return;
+       }
+
+       auto json = DM_instance().registerUser( username, password, email);
+           json->stringify(ostr);
      }},
+
+
     // Login
     {{"POST", std::regex("/login")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
        // handle login request
+       response.add("Access-Control-Allow-Origin", "*");
+       response.setContentType("application/json");
+       std::ostream &ostr = response.send();
+
      }},
     // Get Chatrooms List
     {{"GET", std::regex("/chatrooms")},
