@@ -10,6 +10,7 @@
 
 #include "poco_headers.h"
 #include "DataManager.h"
+#include "chat_jwt.h"
 
 struct RouteKey {
     string requestType;
@@ -29,6 +30,8 @@ inline std::vector<Route> routeTable{
             response.add("Access-Control-Allow-Origin", "*");  // 这里你也可以设置为你的前端域名，而不是'*'
             response.add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
             response.add("Access-Control-Allow-Headers", "Content-Type");
+
+            response.set("Author", "Lambert");
             response.send();
         }
     },
@@ -38,6 +41,8 @@ inline std::vector<Route> routeTable{
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          poco_debug_f1(Application::instance().logger(), "request.getURI() = %s", request.getURI());
          response.add("Access-Control-Allow-Origin", "*");
+         response.add("Access-Control-Allow-Headers", "Authorization");
+
          response.setContentType("application/json");
 
          std::ostream &ostr = response.send();
@@ -55,7 +60,7 @@ inline std::vector<Route> routeTable{
              return;
          }
 
-         auto json = DM_instance().registerUser(username, password, email);
+         Poco::JSON::Object::Ptr json = DM_instance().registerUser(username, password, email);
          json->stringify(ostr);
      }},
 
@@ -64,25 +69,46 @@ inline std::vector<Route> routeTable{
     {{"POST", std::regex("/login")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle login request
-         response.add("Access-Control-Allow-Origin", "*");
          response.setContentType("application/json");
-         std::ostream &ostr = response.send();
+         response.add("Access-Control-Allow-Origin", "*");
+         response.add("Access-Control-Allow-Headers", "Authorization");
+
 
          Poco::JSON::Parser parser;
          auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
 
-         // 处理JSON数据...
-         auto username = res->getValue<string>("username");
-         auto password = res->getValue<string>("password");
-         auto id = res->getValue<int>("id");
+         try {
+             string jwt = request.get("Authorization", "");
+             if (!jwt.empty())
+                 jwt = jwt.substr(7);
+             Poco::JWT::Signer signer(CONST_CONFIG::kTokenSecret);
+             Poco::JWT::Token token = signer.verify(jwt);
+             //We only process situation that token is valid
+             if (token.getExpiration() > Poco::Timestamp()) {
+                 Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+                 json->set("code", 0);
+                 json->set("msg", "JWT验证成功");
+                 Poco::JSON::Object::Ptr data = new Poco::JSON::Object();
+                 data->set("username", token.payload().get("username"));
+                 data->set("id", token.payload().get("id"));
+                 data->set("email", token.payload().get("email"));
+                 json->set("data", data);
+                 json->stringify(response.send());
+             }
 
-         if ((username.empty() && id == 0) || password.empty()) {
-             response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
-             return;
+         }
+         catch (Poco::Exception &e) {
+
+             auto username = res->getValue<string>("username");
+             auto password = res->getValue<string>("password");
+             auto id = res->getValue<int>("id");
+
+             poco_information_f1(Application::instance().logger(), "Exception: %s", e.displayText());
+             Poco::JSON::Object::Ptr json = DM_instance().loginUser(username, id, password);
+             response.set("Authorization", "Bearer " + setJWT(id, username));
+             json->stringify(response.send());
          }
 
-         auto json = DM_instance().loginUser(username,  id, password);
-         json->stringify(ostr);
      }},
     // Get Chatrooms List
     {{"GET", std::regex("/chatrooms")},

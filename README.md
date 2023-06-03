@@ -18,8 +18,8 @@ sudo apt-get install poco
 
 ## Usage
 
-
-
+Edit the JWT secret key in 
+Edit your mysql config in ,
 
 ## Contributing
 
