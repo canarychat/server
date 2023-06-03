@@ -13,5 +13,5 @@ add_subdirectory(./activeRecordModel)  # Add the activerecordModel subdirectory
 
 INCLUDE_DIRECTORIES(./net ./data ./activeRecordModel/include ./support)
 add_executable(server ${SRC} ${NET_SRC} ${DATA_SRC} ${SUP_SRC})
-target_link_libraries(server Poco::Foundation Poco::Util Poco::Net Poco::XML Poco::JSON Poco::ActiveRecord PocoUtil PocoNet PocoXML PocoJSON PocoFoundation PocoData PocoDataMySQL PocoCrypto)
+target_link_libraries(server Poco::Foundation Poco::Util Poco::Net Poco::XML Poco::JSON Poco::ActiveRecord PocoUtil PocoNet PocoXML PocoJSON PocoFoundation PocoData PocoDataMySQL PocoCrypto PocoJWT)
 target_link_libraries(server activeRecordModel)

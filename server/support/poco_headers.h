@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "const.h"
+
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/ServerSocket.h"
@@ -53,6 +55,9 @@
 #include <Poco/HexBinaryDecoder.h>
 #include <Poco/Base64Decoder.h>
 #include <Poco/Base64Encoder.h>
+#include <Poco/JWT/Token.h>
+#include <Poco/JWT/Signer.h>
+#include <Poco/JWT/Serializer.h>
 
 
 using namespace Poco::Net;

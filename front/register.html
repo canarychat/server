@@ -38,7 +38,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code !== 0) {
-                    document.getElementById('message').innerText = '注册失败：' + data.code;
+                    document.getElementById('message').innerText = '注册失败：' + data.msg;
                     return;
                 }
                 document.getElementById('message').innerText = '注册成功，你的用户ID是：' + data.data.id;
