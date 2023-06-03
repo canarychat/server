@@ -6,8 +6,13 @@
 </head>
 <body>
 <form id="loginForm">
-  <label for="usernameOrId">用户名或ID:</label><br>
-  <input type="text" id="usernameOrId" name="usernameOrId"><br>
+  <label for="loginType">登录方式:</label><br>
+  <select id="loginType">
+    <option value="username">用户名</option>
+    <option value="id">ID</option>
+  </select><br>
+  <label for="identifier">用户名/ID:</label><br>
+  <input type="text" id="identifier" name="identifier"><br>
   <label for="password">密码:</label><br>
   <input type="password" id="password" name="password"><br>
   <input type="submit" value="登录">
@@ -18,10 +23,12 @@
   document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    var usernameOrId = document.getElementById('usernameOrId').value;
+    var loginType = document.getElementById('loginType').value;
+    var identifier = document.getElementById('identifier').value;
     var password = document.getElementById('password').value;
-    var id = isNaN(usernameOrId) ? 0 : parseInt(usernameOrId);
-    var username = isNaN(usernameOrId) ? usernameOrId : '';
+
+    var id = loginType === 'id' ? parseInt(identifier) : 0;
+    var username = loginType === 'username' ? identifier : '';
 
     fetch('http://localhost/api/v1/login', {
       method: 'POST',
@@ -39,7 +46,7 @@
               if (data.code === 0) {
                 document.getElementById('message').innerText = '登录成功';
               } else {
-                document.getElementById('message').innerText = '登录失败：' + data.msg;
+                document.getElementById('message').innerText = '登录失败：' + data.code;
               }
             })
             .catch((error) => {
