@@ -18,4 +18,3 @@ inline std::string setJWT ( const int& user_id,const std::string& username){
     string jwt= signer.sign(token, Poco::JWT::Signer::ALGO_HS256);
     return jwt;
 }
-

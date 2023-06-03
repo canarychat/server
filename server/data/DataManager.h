@@ -5,6 +5,7 @@
 #pragma once
 #include "poco_headers.h"
 #include "state_code.h"
+#include "UserManager.h"
 
 using Poco::Util::Subsystem;
 using Poco::Util::Application;
@@ -26,10 +27,14 @@ class DataManager : public Subsystem {
   }
 
   //功能函数
-  Poco::JSON::Object::Ptr registerUser(const std::string& username, const std::string& password, const std::string& email="");
+  static Poco::JSON::Object::Ptr registerUser(const std::string& username, const std::string& password, const std::string& email=""){
+    return  Application::instance().getSubsystem<UserManager>().registerUser(username, password, email);
+  }
 
-    Poco::JSON::Object::Ptr loginUser(const std::string& username, const int &user_id, const std::string& password);
- private:
+    static Poco::JSON::Object::Ptr loginUser(const std::string& username, const int &user_id, const std::string& password){
+      return  Application::instance().getSubsystem<UserManager>().loginUser(username, user_id, password);
+  }
+  private:
     // 数据库连接
     std::unique_ptr<Poco::Data::Session> p_session_;
     // 数据库上下文

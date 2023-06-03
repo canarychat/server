@@ -16,6 +16,7 @@
   <label for="password">密码:</label><br>
   <input type="password" id="password" name="password"><br>
   <input type="submit" value="登录">
+  <button id="verifyBtn">验证</button>
 </form>
 <p id="message"></p>
 
@@ -41,12 +42,39 @@
         "id": id
       })
     })
-            .then(response => response.json())
+            .then(response => {
+              localStorage.setItem('jwt', response.headers.get('Authorization'));
+              return response.json();
+            })
             .then(data => {
               if (data.code === 0) {
                 document.getElementById('message').innerText = '登录成功';
               } else {
-                document.getElementById('message').innerText = '登录失败：' + data.code;
+                document.getElementById('message').innerText = '登录失败：' + data.msg;
+              }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+  });
+
+  document.getElementById('verifyBtn').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    var jwt = localStorage.getItem('jwt');
+
+    fetch('http://localhost/api/v1/login', {
+      method: 'POST',
+      headers: {
+        'Authorization': jwt,
+      },
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.code === 0) {
+                document.getElementById('message').innerText = '验证成功';
+              } else {
+                document.getElementById('message').innerText = '验证失败：' + data.msg;
               }
             })
             .catch((error) => {
