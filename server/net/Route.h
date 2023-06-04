@@ -29,7 +29,9 @@ inline std::vector<Route> routeTable{
 //          poco_debug_f1(Application::instance().logger(), "request.getURI() = %s", request.getURI());
             response.add("Access-Control-Allow-Origin", "*");  // 这里你也可以设置为你的前端域名，而不是'*'
             response.add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
-            response.add("Access-Control-Allow-Headers", "Content-Type");
+//            response.add("Access-Control-Allow-Headers", "Authorization, Content-Type");
+//            response.set("Access-Control-Expose-Headers", "Authorization");
+
 
             response.set("Author", "Lambert");
             response.send();
@@ -71,11 +73,12 @@ inline std::vector<Route> routeTable{
          // handle login request
          response.setContentType("application/json");
          response.add("Access-Control-Allow-Origin", "*");
-         response.add("Access-Control-Allow-Headers", "Authorization");
+         response.add("Access-Control-Allow-Methods", "POST");
+//         response.add("Access-Control-Allow-Headers", "Authorization, Content-Type");
+//         response.set("Access-Control-Expose-Headers", "Authorization");
 
 
-         Poco::JSON::Parser parser;
-         auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
+
 
          try {
              string jwt = request.get("Authorization", "");
@@ -99,13 +102,17 @@ inline std::vector<Route> routeTable{
          }
          catch (Poco::Exception &e) {
 
+             Poco::JSON::Parser parser;
+             auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
              auto username = res->getValue<string>("username");
              auto password = res->getValue<string>("password");
              auto id = res->getValue<int>("id");
 
              poco_information_f1(Application::instance().logger(), "Exception: %s", e.displayText());
              Poco::JSON::Object::Ptr json = DM_instance().loginUser(username, id, password);
-             response.set("Authorization", "Bearer " + setJWT(id, username));
+             if (json->getValue<int>("code") == 0) {
+                 response.set("Authorization", "Bearer " + setJWT(id, username));
+             }
              json->stringify(response.send());
          }
 

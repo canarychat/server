@@ -2,26 +2,51 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>登录页面</title>
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 20%;
+      background-color: #f2f2f2;
+    }
+    .button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+    label, select, input {
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
 <form id="loginForm">
-  <label for="loginType">登录方式:</label><br>
+  <label for="loginType">Login Type:</label><br>
   <select id="loginType">
-    <option value="username">用户名</option>
+    <option value="username">Username</option>
     <option value="id">ID</option>
   </select><br>
-  <label for="identifier">用户名/ID:</label><br>
+  <label for="identifier">Username/ID:</label><br>
   <input type="text" id="identifier" name="identifier"><br>
-  <label for="password">密码:</label><br>
+  <label for="password">Password:</label><br>
   <input type="password" id="password" name="password"><br>
-  <input type="submit" value="登录">
-  <button id="verifyBtn">验证</button>
+  <button id="loginBtn" class="button">Login</button>
+  <button id="verifyBtn" class="button">Verify</button>
 </form>
 <p id="message"></p>
 
 <script>
-  document.getElementById('loginForm').addEventListener('submit', function(event) {
+  document.getElementById('loginBtn').addEventListener('click', function(event) {
     event.preventDefault();
 
     var loginType = document.getElementById('loginType').value;
@@ -48,9 +73,10 @@
             })
             .then(data => {
               if (data.code === 0) {
-                document.getElementById('message').innerText = '登录成功';
+                document.getElementById('message').innerText = 'Login Successful';
+                window.location.href = '/static/chatroom/chatroom.html';
               } else {
-                document.getElementById('message').innerText = '登录失败：' + data.msg;
+                document.getElementById('message').innerText = 'Login Failed: ' + data.msg;
               }
             })
             .catch((error) => {
@@ -68,13 +94,15 @@
       headers: {
         'Authorization': jwt,
       },
+      redirect: 'follow'
     })
             .then(response => response.json())
             .then(data => {
               if (data.code === 0) {
-                document.getElementById('message').innerText = '验证成功';
+                document.getElementById('message').innerText = 'Verification Successful';
+                window.location.href = '/static/chatroom/chatroom.html';
               } else {
-                document.getElementById('message').innerText = '验证失败：' + data.msg;
+                document.getElementById('message').innerText = 'Verification Failed: ' + data.msg;
               }
             })
             .catch((error) => {
