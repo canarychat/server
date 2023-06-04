@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chatroom Selection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f2f2f2;
+    }
+    .chatroom {
+      background-color: white;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+<h1>Chatrooms</h1>
+<div id="chatroomContainer"></div>
+<button id="addChatroom" class="button">Add Chatroom</button>
+
+<script>
+  function loadChatrooms() {
+    const jwt = localStorage.getItem('jwt');
+    fetch('/api/v1/chatrooms', {
+      headers: {
+        'Authorization': jwt,
+      },
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.code === 0) {
+                const chatrooms = data.data.chatrooms;
+                chatrooms.forEach(chatroom => {
+                  const div = document.createElement('div');
+                  div.className = 'chatroom';
+                  div.innerHTML = `
+                                <h2>${chatroom.name}</h2>
+                                <p>${chatroom.description}</p>
+                                <button onclick="location.href='/chatroom/${chatroom.roomid}'" class="button">Enter Chatroom</button>
+                                <button onclick="leaveChatroom(${chatroom.roomid})" class="button">Leave Chatroom</button>
+                            `;
+                  document.getElementById('chatroomContainer').appendChild(div);
+                });
+              }
+            });
+  }
+
+  function leaveChatroom(id) {
+    const jwt = localStorage.getItem('jwt');
+    fetch(`/api/v1/chatrooms/${id}/member`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': jwt,
+      },
+    })
+            .then(response => {
+              if (response.ok) {
+                // Refresh the chatroom list
+                document.getElementById('chatroomContainer').innerHTML = '';
+                loadChatrooms();
+              }
+            });
+  }
+
+  document.getElementById('addChatroom').addEventListener('click', function() {
+    window.location.href = '/addChatroom';
+  });
+
+  loadChatrooms();
+</script>
+</body>
+</html>

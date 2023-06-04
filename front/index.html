@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Welcome to our Chatroom!</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 20%;
+      background-color: #f2f2f2;
+    }
+    .button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+<h1>Welcome to our Chatroom!</h1>
+<button id="login" class="button">Login</button>
+<button id="register" class="button">Register</button>
+
+<script>
+  document.getElementById('login').addEventListener('click', function() {
+    window.location.href = '/static/chatroom/login.html';
+  });
+  document.getElementById('register').addEventListener('click', function() {
+    window.location.href = '/static/chatroom/register.html';
+  });
+</script>
+</body>
+</html>

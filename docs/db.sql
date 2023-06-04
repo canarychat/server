@@ -17,6 +17,7 @@ CREATE TABLE rooms
 (
     id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE,
     name       VARCHAR(255) NOT NULL,
+    owner_id   INT NOT NULL REFERENCES users (id),
     create_time DATE DEFAULT CURRENT_DATE,
     update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
