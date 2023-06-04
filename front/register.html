@@ -2,22 +2,47 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>注册页面</title>
+    <title>Register Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 20%;
+            background-color: #f2f2f2;
+        }
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        label, input {
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
 <form id="registerForm">
-    <label for="username">用户名:</label><br>
+    <label for="username">Username:</label><br>
     <input type="text" id="username" name="username"><br>
-    <label for="password">密码:</label><br>
+    <label for="password">Password:</label><br>
     <input type="password" id="password" name="password"><br>
-    <label for="email">邮箱:</label><br>
+    <label for="email">Email:</label><br>
     <input type="email" id="email" name="email"><br>
-    <input type="submit" value="注册">
+    <button id="registerBtn" class="button">Register</button>
 </form>
 <p id="message"></p>
 
 <script>
-    document.getElementById('registerForm').addEventListener('submit', function(event) {
+    document.getElementById('registerBtn').addEventListener('click', function(event) {
         event.preventDefault();
 
         var username = document.getElementById('username').value;
@@ -38,10 +63,11 @@
             .then(response => response.json())
             .then(data => {
                 if (data.code !== 0) {
-                    document.getElementById('message').innerText = '注册失败：' + data.msg;
+                    document.getElementById('message').innerText = 'Registration Failed: ' + data.msg;
                     return;
                 }
-                document.getElementById('message').innerText = '注册成功，你的用户ID是：' + data.data.id;
+                document.getElementById('message').innerText = 'Registration Successful. Your User ID is: ' + data.data.id;
+                window.location.href = '/static/chatroom/login.html';
             })
             .catch((error) => {
                 console.error('Error:', error);
