@@ -47,6 +47,25 @@
     .add:hover {
       background-color: #45a049;
     }
+    .delete {
+      background-color: #dc3545; /* Red color for delete */
+      position: relative; /* Required for progress bar */
+      overflow: hidden; /* Hide progress bar when it goes outside button */
+    }
+    .delete:before {
+      content: ''; /* Create a pseudo element */
+      position: absolute; /* Position it absolutely inside button */
+      bottom: 0; /* Start from bottom */
+      left: 0; /* Start from left */
+      width: 0; /* Initially no width */
+      height: 100%; /* Full height */
+      background-color: #6f42c1; /* Purple color for progress bar */
+      transition: none; /* No transition */
+    }
+    .delete.long-pressing:before {
+      width: 100%; /* Full width when long pressing */
+      transition: width 2s linear; /* Transition over 2s */
+    }
   </style>
 </head>
 <body>
@@ -57,6 +76,8 @@
 <script>
   function loadChatrooms() {
     const jwt = localStorage.getItem('jwt');
+    const userId = localStorage.getItem('userId');
+
     fetch('/api/v1/chatrooms', {
       headers: {
         'Authorization': jwt,
@@ -74,29 +95,100 @@
                                 <p>${chatroom.description}</p>
                                 <br> <!-- Added line break for buttons to be on a new line -->
                                 <button onclick="location.href='/chatroom/${chatroom.roomid}'" class="button enter">Enter Chatroom</button>
-                                <button onclick="leaveChatroom(${chatroom.roomid})" class="button leave">Leave Chatroom</button>
                             `;
                   document.getElementById('chatroomContainer').appendChild(div);
+
+                  // Only add delete button if the user is the owner
+                  if (chatroom.owner_id == userId) {
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'button delete';
+                    deleteButton.textContent = 'Delete Chatroom';
+                    deleteButton.onmousedown = function() { handleButtonMouseDown(deleteButton, function() { deleteChatroom(chatroom.roomid, deleteButton); }); };
+                    deleteButton.onmouseup = deleteButton.onmouseleave = function() { handleButtonMouseUp(deleteButton); };
+                    div.appendChild(deleteButton);
+                  }
+                  // Add leave button if the user is not the owner
+                  else {
+                    const leaveButton = document.createElement('button');
+                    leaveButton.className = 'button leave';
+                    leaveButton.textContent = 'Leave Chatroom';
+                    leaveButton.onclick = function() { leaveChatroom(chatroom.roomid); };
+                    div.appendChild(leaveButton);
+                  }
                 });
               }
             });
   }
 
   function leaveChatroom(id) {
-    const jwt = localStorage.getItem('jwt');
-    fetch(`/api/v1/chatrooms/${id}/member`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': jwt,
-      },
-    })
-            .then(response => {
-              if (response.ok) {
-                // Refresh the chatroom list
-                document.getElementById('chatroomContainer').innerHTML = '';
-                loadChatrooms();
-              }
-            });
+    if (confirm('Are you sure you want to leave this chatroom?')) {
+      const jwt = localStorage.getItem('jwt');
+      const userId = localStorage.getItem('userId');
+      fetch(`/api/v1/chatrooms/${id}/member`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': jwt,
+        },
+        body: JSON.stringify({
+          id: userId,
+        }),
+      })
+              .then(response => response.json())
+              .then(data => {
+                if (data.code === 0) {
+                  // Refresh the chatroom list
+                  document.getElementById('chatroomContainer').innerHTML = '';
+                  loadChatrooms();
+                } else {
+                  alert('Failed to leave chatroom: ' + data.msg);
+                }
+              });
+    }
+  }
+
+  function deleteChatroom(id, btn) {
+    // Start long press
+    btn.classList.add('long-pressing');
+
+    // Wait for 2s
+    setTimeout(function() {
+      // End long press
+      btn.classList.remove('long-pressing');
+
+      // Only delete if button is still being pressed
+      if (btn.pressing) {
+        if (confirm('Are you sure you want to delete this chatroom?')) {
+          const jwt = localStorage.getItem('jwt');
+          fetch(`/api/v1/chatrooms/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': jwt,
+            },
+          })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.code === 0) {
+                      // Refresh the chatroom list
+                      document.getElementById('chatroomContainer').innerHTML = '';
+                      loadChatrooms();
+                    } else {
+                      alert('Failed to delete chatroom: ' + data.msg);
+                    }
+                  });
+        }
+      }
+    }, 2000);
+  }
+
+  function handleButtonMouseDown(btn, action) {
+    btn.pressing = true;
+    action();
+  }
+
+  function handleButtonMouseUp(btn) {
+    btn.pressing = false;
+    btn.classList.remove('long-pressing');
   }
 
   document.getElementById('addChatroom').addEventListener('click', function() {
@@ -105,5 +197,6 @@
 
   loadChatrooms();
 </script>
+
 </body>
 </html>
