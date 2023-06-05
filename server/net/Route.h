@@ -106,12 +106,15 @@ inline std::vector<Route> routeTable{
              auto password = res->getValue<string>("password");
              auto id = res->getValue<int>("id");
 
-             poco_information_f1(Application::instance().logger(), "Exception: %s", e.displayText());
              Poco::JSON::Object::Ptr json = DataFacade::loginUser(username, id, password);
              if (id == 0)
                  id = DataFacade::get_id_from_name(username);
              if (json->getValue<int>("code") == 0) {
                  response.set("Authorization", "Bearer " + setJWT(id, username));
+                 Poco::JSON::Object::Ptr data = new Poco::JSON::Object();
+                 data->set("username", username);
+                 data->set("id", id);
+                 json->set("data", data);
              }
              json->stringify(response.send());
          }

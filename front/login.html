@@ -73,6 +73,8 @@
             })
             .then(data => {
               if (data.code === 0) {
+                localStorage.setItem('username', data.data.username);
+                localStorage.setItem('id', data.data.id);
                 document.getElementById('message').innerText = 'Login Successful';
                 window.location.href = '/static/chatroom/chatroom.html';
               } else {
