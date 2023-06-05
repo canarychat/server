@@ -11,6 +11,8 @@
 #include "poco_headers.h"
 #include "DataManager.h"
 #include "chat_jwt.h"
+#include "state_code.h"
+#include "DataFacade.h"
 
 struct RouteKey {
     string requestType;
@@ -62,7 +64,7 @@ inline std::vector<Route> routeTable{
              return;
          }
 
-         Poco::JSON::Object::Ptr json = DM_instance().registerUser(username, password, email);
+         Poco::JSON::Object::Ptr json = DataFacade::registerUser(username, password, email);
          json->stringify(ostr);
      }},
 
@@ -76,9 +78,6 @@ inline std::vector<Route> routeTable{
          response.add("Access-Control-Allow-Methods", "POST");
 //         response.add("Access-Control-Allow-Headers", "Authorization, Content-Type");
 //         response.set("Access-Control-Expose-Headers", "Authorization");
-
-
-
 
          try {
              string jwt = request.get("Authorization", "");
@@ -109,7 +108,7 @@ inline std::vector<Route> routeTable{
              auto id = res->getValue<int>("id");
 
              poco_information_f1(Application::instance().logger(), "Exception: %s", e.displayText());
-             Poco::JSON::Object::Ptr json = DM_instance().loginUser(username, id, password);
+             Poco::JSON::Object::Ptr json = DataFacade::loginUser(username, id, password);
              if (json->getValue<int>("code") == 0) {
                  response.set("Authorization", "Bearer " + setJWT(id, username));
              }
@@ -120,7 +119,23 @@ inline std::vector<Route> routeTable{
     // Get Chatrooms List
     {{"GET", std::regex("/chatrooms")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
-         // handle get chatrooms list request
+
+         int id;
+         try {
+             auto jwt = request.get("Authorization", "");
+             Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
+             Poco::JWT::Token token = signer.verify(jwt);
+             id = token.payload().get("user_id");
+         }
+         catch (Poco::Exception &e) {
+             Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+             json->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
+             json->set("msg", "JWT验证失败");
+             json->stringify(response.send());
+         }
+
+         Poco::JSON::Object::Ptr result = DataFacade::getRoomList(id);
+            result->stringify(response.send());
      }},
     // Create Chatroom
     {{"POST", std::regex("/chatroom")},
