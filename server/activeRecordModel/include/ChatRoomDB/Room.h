@@ -29,6 +29,9 @@ class Room: public Poco::ActiveRecord::ActiveRecord<Poco::Int32>
     const std::string& name() const;
     Room& name(const std::string& value);
 
+    const Poco::Nullable<std::string>& description() const;
+    Room& description(const Poco::Nullable<std::string>& value);
+
     const Poco::Data::Date& create_time() const;
     Room& create_time(const Poco::Data::Date& value);
 
@@ -51,6 +54,7 @@ class Room: public Poco::ActiveRecord::ActiveRecord<Poco::Int32>
 
   private:
     std::string _name;
+    Poco::Nullable<std::string> _description;
     Poco::Int32 _owner_id = User::INVALID_ID;
     Poco::Data::Date _create_time;
     Poco::Data::Date _update_time;
@@ -68,6 +72,19 @@ inline const std::string& Room::name() const
 inline Room& Room::name(const std::string& value)
 {
     _name = value;
+    return *this;
+}
+
+
+inline const Poco::Nullable<std::string>& Room::description() const
+{
+    return _description;
+}
+
+
+inline Room& Room::description(const Poco::Nullable<std::string>& value)
+{
+    _description = value;
     return *this;
 }
 
@@ -124,12 +141,13 @@ class TypeHandler<ChatRoomDB::Room>
   public:
     static std::size_t size()
     {
-        return 4;
+        return 5;
     }
 
     static void bind(std::size_t pos, const ChatRoomDB::Room& ar, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
     {
         TypeHandler<std::string>::bind(pos++, ar._name, pBinder, dir);
+        TypeHandler<Poco::Nullable<std::string>>::bind(pos++, ar._description, pBinder, dir);
         TypeHandler<Poco::Int32>::bind(pos++, ar._owner_id, pBinder, dir);
         TypeHandler<Poco::Data::Date>::bind(pos++, ar._create_time, pBinder, dir);
         TypeHandler<Poco::Data::Date>::bind(pos++, ar._update_time, pBinder, dir);
@@ -138,6 +156,7 @@ class TypeHandler<ChatRoomDB::Room>
     static void extract(std::size_t pos, ChatRoomDB::Room& ar, const ChatRoomDB::Room& deflt, AbstractExtractor::Ptr pExtr)
     {
         TypeHandler<std::string>::extract(pos++, ar._name, deflt._name, pExtr);
+        TypeHandler<Poco::Nullable<std::string>>::extract(pos++, ar._description, deflt._description, pExtr);
         TypeHandler<Poco::Int32>::extract(pos++, ar._owner_id, deflt._owner_id, pExtr);
         TypeHandler<Poco::Data::Date>::extract(pos++, ar._create_time, deflt._create_time, pExtr);
         TypeHandler<Poco::Data::Date>::extract(pos++, ar._update_time, deflt._update_time, pExtr);
@@ -146,6 +165,7 @@ class TypeHandler<ChatRoomDB::Room>
     static void prepare(std::size_t pos, const ChatRoomDB::Room& ar, AbstractPreparator::Ptr pPrep)
     {
         TypeHandler<std::string>::prepare(pos++, ar._name, pPrep);
+        TypeHandler<Poco::Nullable<std::string>>::prepare(pos++, ar._description, pPrep);
         TypeHandler<Poco::Int32>::prepare(pos++, ar._owner_id, pPrep);
         TypeHandler<Poco::Data::Date>::prepare(pos++, ar._create_time, pPrep);
         TypeHandler<Poco::Data::Date>::prepare(pos++, ar._update_time, pPrep);

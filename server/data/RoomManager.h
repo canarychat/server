@@ -25,6 +25,8 @@ class RoomManager : public Poco::Util::Subsystem {
     //功能函数
     Poco::JSON::Object::Ptr getRoomList(int user_id);
 
+    Poco::JSON::Object::Ptr createRoom(int owner_id, std::string room_name, std::string description="");
+
   private:
 
 };

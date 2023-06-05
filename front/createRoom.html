@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Create Chatroom</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f2f2f2;
+    }
+    .form-control {
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+<h1>Create a New Chatroom</h1>
+<div>
+  <label for="name">Chatroom Name:</label>
+  <input type="text" id="name" class="form-control">
+</div>
+<div>
+  <label for="description">Description:</label>
+  <textarea id="description" class="form-control"></textarea>
+</div>
+<button id="createChatroom" class="button">Create Chatroom</button>
+
+<script>
+  document.getElementById('createChatroom').addEventListener('click', function() {
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const jwt = localStorage.getItem('jwt');
+    fetch('/api/v1/chatroom', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': jwt
+      },
+      body: JSON.stringify({
+        name: name,
+        description: description
+      }),
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.code === 0) {
+                alert('Chatroom created successfully');
+                // Use the returned room_id to redirect to the new chatroom page
+                window.location.href = '/chatroom/' + data.data.room_id + '.html';
+              } else {
+                alert('Failed to create chatroom: ' + data.msg);
+              }
+            });
+  });
+</script>
+
+</body>
+</html>
