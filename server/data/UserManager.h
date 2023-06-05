@@ -4,11 +4,14 @@
 
 #pragma once
 
+
 #include "poco_headers.h"
 
 class UserManager: public Poco::Util::Subsystem{
     public:
-    UserManager( Poco::ActiveRecord::Context::Ptr p_context):p_context_(p_context){   }
+    explicit UserManager()
+
+    { }
     const char* name() const override
     {
         return "UserManager";
@@ -29,7 +32,4 @@ class UserManager: public Poco::Util::Subsystem{
     Poco::JSON::Object::Ptr loginUser(const std::string& username, const int &user_id, const std::string& password);
 
   private:
-    private:
-        // 数据库上下文
-        Poco::ActiveRecord::Context::Ptr p_context_= nullptr;
 };
