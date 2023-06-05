@@ -14,18 +14,37 @@
       margin: 10px;
       padding: 10px;
       border-radius: 5px;
+      width: 60%; /* Adjust the size of the chatroom div */
+      margin: 10px auto; /* Center the div */
+    }
+    .chatroom h2, .chatroom p {
+      display: inline-block; /* Make title and description side by side */
     }
     .button {
       padding: 10px 20px;
       font-size: 18px;
       color: white;
-      background-color: #4CAF50;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    .button:hover {
+    .enter {
+      background-color: #007BFF; /* Blue color for enter */
+    }
+    .enter:hover {
+      background-color: #0069d9;
+    }
+    .leave {
+      background-color: #dc3545; /* Red color for leave */
+    }
+    .leave:hover {
+      background-color: #c82333;
+    }
+    .add {
+      background-color: #4CAF50; /* Green color for add chatroom */
+    }
+    .add:hover {
       background-color: #45a049;
     }
   </style>
@@ -33,7 +52,7 @@
 <body>
 <h1>Chatrooms</h1>
 <div id="chatroomContainer"></div>
-<button id="addChatroom" class="button">Add Chatroom</button>
+<button id="addChatroom" class="button add">Add Chatroom</button>
 
 <script>
   function loadChatrooms() {
@@ -53,8 +72,9 @@
                   div.innerHTML = `
                                 <h2>${chatroom.name}</h2>
                                 <p>${chatroom.description}</p>
-                                <button onclick="location.href='/chatroom/${chatroom.roomid}'" class="button">Enter Chatroom</button>
-                                <button onclick="leaveChatroom(${chatroom.roomid})" class="button">Leave Chatroom</button>
+                                <br> <!-- Added line break for buttons to be on a new line -->
+                                <button onclick="location.href='/chatroom/${chatroom.roomid}'" class="button enter">Enter Chatroom</button>
+                                <button onclick="leaveChatroom(${chatroom.roomid})" class="button leave">Leave Chatroom</button>
                             `;
                   document.getElementById('chatroomContainer').appendChild(div);
                 });
@@ -80,7 +100,7 @@
   }
 
   document.getElementById('addChatroom').addEventListener('click', function() {
-    window.location.href = '/addChatroom';
+    window.location.href = '/static/chatroom/createRoom.html';
   });
 
   loadChatrooms();

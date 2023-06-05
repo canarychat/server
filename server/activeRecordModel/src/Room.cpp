@@ -24,6 +24,7 @@ Room::Room(ID id):
 Room::Room(const Room& other):
     Poco::ActiveRecord::ActiveRecord<Poco::Int32>(other),
     _name(other._name),
+    _description(other._description),
     _owner_id(other._owner_id),
     _create_time(other._create_time),
     _update_time(other._update_time)
@@ -53,7 +54,7 @@ Room::Ptr Room::find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id)
     Room::Ptr pObject(new Room);
 
     pContext->session()
-        << "SELECT id, name, owner_id, create_time, update_time"
+        << "SELECT id, name, description, owner_id, create_time, update_time"
         << "  FROM rooms"
         << "  WHERE id = " << pSPP->next(),
         into(pObject->mutableID()),
@@ -70,8 +71,8 @@ void Room::insert()
     Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
     context()->session()
-        << "INSERT INTO rooms (id, name, owner_id, create_time, update_time)"
-        << "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
+        << "INSERT INTO rooms (id, name, description, owner_id, create_time, update_time)"
+        << "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
         use(*this),
         now;
     updateID(context()->session());
@@ -84,7 +85,7 @@ void Room::update()
 
     context()->session()
         << "UPDATE rooms"
-        << "  SET name = " << pSPP->next() << ", owner_id = " << pSPP->next() << ", create_time = " << pSPP->next() << ", update_time = " << pSPP->next()
+        << "  SET name = " << pSPP->next() << ", description = " << pSPP->next() << ", owner_id = " << pSPP->next() << ", create_time = " << pSPP->next() << ", update_time = " << pSPP->next()
         << "  WHERE id = " << pSPP->next(),
         use(*this),
         bind(id()),
@@ -110,6 +111,7 @@ const std::vector<std::string>& Room::columns()
         {
             "id"s,
             "name"s,
+            "description"s,
             "owner_id"s,
             "create_time"s,
             "update_time"s,

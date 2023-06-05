@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include <utility>
+
 #include "poco_headers.h"
 #include "DataManager.h"
 #include "UserManager.h"
@@ -29,4 +31,21 @@ struct DataFacade {
     static Poco::Data::Session getSession() {
         return Application::instance().getSubsystem<DataManager>().getSession();
     }
+
+    static int get_id_from_name(std::basic_string<char> username) {
+        auto session = getSession();
+        Poco::Data::Statement select(session);
+
+        int id = 0;
+        select << "SELECT id FROM users WHERE username = ?",
+            Poco::Data::Keywords::into(id),
+            Poco::Data::Keywords::use(username),
+            Poco::Data::Keywords::now;
+        return id;
+    }
+
+    static Poco::JSON::Object::Ptr createRoom(int owner_id, std::string room_name, std::string room_description) {
+        return Application::instance().getSubsystem<RoomManager>().createRoom(owner_id, std::move(room_name), std::move(room_description));
+    }
+
 };// namespace DataFacade

@@ -12,6 +12,7 @@
     <class name="Room" table="rooms" autoIncrementID="true">1
         <property name="id" type="int32"/>
         <property name="name" type="string"/>
+        <property name="description" type="string" nullable="true" />
         <property name="owner_id" type="int32" references="User"/>
         <property name="create_time" type="date"/>
         <property name="update_time" type="date"/>
