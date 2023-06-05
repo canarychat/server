@@ -58,6 +58,13 @@
 #include <Poco/JWT/Token.h>
 #include <Poco/JWT/Signer.h>
 #include <Poco/JWT/Serializer.h>
+#include <Poco/Data/Session.h>
+#include <Poco/Data/MySQL/Connector.h>
+#include <Poco/Data/RecordSet.h>
+#include <Poco/Data/Statement.h>
+#include <Poco/Data/SessionPool.h>
+#include <Poco/Environment.h>
+
 
 
 using namespace Poco::Net;

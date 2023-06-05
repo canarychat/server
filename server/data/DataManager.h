@@ -3,48 +3,34 @@
 //
 
 #pragma once
+
+#include <memory>
+
 #include "poco_headers.h"
 #include "state_code.h"
-#include "UserManager.h"
 
 using Poco::Util::Subsystem;
 using Poco::Util::Application;
 
 class DataManager : public Subsystem {
- public:
-  DataManager() =default;
-  const char* name() const override
-  {
-    return "DataManager";
-  }
+  public:
+    explicit DataManager(const string &config);
+    const char *name() const override {
+        return "DataManager";
+    }
 
-  void initialize(Poco::Util::Application& app) override;
+    void initialize(Poco::Util::Application &app) override;
 
-  void uninitialize() override
-  {
-    // 子系统的清理逻辑
-    Application::instance().logger().information("DataManager unInit");
-  }
+    void uninitialize() override {
+        // 子系统的清理逻辑
+        Application::instance().logger().information("DataManager unInit");
+    }
 
-  //功能函数
-  static Poco::JSON::Object::Ptr registerUser(const std::string& username, const std::string& password, const std::string& email=""){
-    return  Application::instance().getSubsystem<UserManager>().registerUser(username, password, email);
-  }
+    Poco::Data::Session getSession() {
+        return session_pool_.get();
+    }
 
-    static Poco::JSON::Object::Ptr loginUser(const std::string& username, const int &user_id, const std::string& password){
-      return  Application::instance().getSubsystem<UserManager>().loginUser(username, user_id, password);
-  }
   private:
-    // 数据库连接
-    std::unique_ptr<Poco::Data::Session> p_session_;
-    // 数据库上下文
-    Poco::ActiveRecord::Context::Ptr p_context_= nullptr;
+    Poco::Data::SessionPool session_pool_;
+    friend struct DataFacade;
 };
-
-//class RequestOberver{
-// public:
-//    RequestOberver() = default;
-//  void onNotification(RequestNotification::Ptr pNf)
-//  {
-//  }
-//};

@@ -3,12 +3,12 @@
 //
 
 #include "UserManager.h"
-#include "DataManager.h"
 #include "ChatRoomDB/User.h"
+#include "state_code.h"
+#include "DataFacade.h"
 
 void UserManager::initialize(Poco::Util::Application &app) {
     app.logger().information("UserManager Init");
-
 }
 
 Poco::JSON::Object::Ptr UserManager::registerUser
@@ -36,7 +36,11 @@ Poco::JSON::Object::Ptr UserManager::registerUser
     engine.update(password + salt);
     std::string hashed_password = Poco::DigestEngine::digestToHex(engine.digest());
     try {
-        Poco::ActiveRecord::Query<ChatRoomDB::User> query(p_context_);
+        auto session = DataFacade::getSession();
+
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+
+        Poco::ActiveRecord::Query<ChatRoomDB::User> query(p_context);
         auto existing_user = query.where("username=?").bind(username).limit(1).execute();
         if (!existing_user.empty()) {
             // The username already exists. Return an error.
@@ -61,7 +65,7 @@ Poco::JSON::Object::Ptr UserManager::registerUser
         }
 
         p_user->username(username).password(hashed_password).salt(salt);
-        p_user->create(p_context_);
+        p_user->create(p_context);
     }
     catch (Poco::Exception &e) {
         // If any other exception occurs, log it and return a server error.
@@ -95,7 +99,9 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         return respond_json;
     } else if (username.empty()) {
         //login with ID
-        auto user = ChatRoomDB::User::find(p_context_, user_id);
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+        auto user = ChatRoomDB::User::find(p_context, user_id);
         if (user == nullptr) {
             respond_json->set("code", static_cast<int>(state_code::LOGIN_ID_NOT_EXIST));
             respond_json->set("msg", "ID不存在");
@@ -105,7 +111,9 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         stored_password = user->password();
     } else if (user_id == 0) {
         //login with username
-        Poco::ActiveRecord::Query<ChatRoomDB::User> query(p_context_);
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+        Poco::ActiveRecord::Query<ChatRoomDB::User> query(p_context);
         auto user = query.where("username=?").bind(username).limit(1).execute();
         if (user.empty()) {
             respond_json->set("code", static_cast<int>(state_code::LOGIN_USERNAME_NOT_EXIST));
