@@ -23,7 +23,8 @@ Poco::JSON::Object::Ptr RoomManager::getRoomList(int user_id) {
         if (p_user) {
             int temp_user_id = user_id;
             Poco::Data::Statement select(session);
-            select << "SELECT rooms.id as roomid, rooms.name as name, rooms.description as description "
+            select << "SELECT rooms.id as roomid, rooms.name as name, "
+                      "rooms.description as description , rooms.owner_id as owner_id "
                    << "FROM rooms "
                    << "JOIN user_room_relation "
                    << "ON rooms.id = user_room_relation.room_id "
@@ -39,7 +40,7 @@ Poco::JSON::Object::Ptr RoomManager::getRoomList(int user_id) {
                 Poco::JSON::Object::Ptr roomObject = new Poco::JSON::Object;
                 roomObject->set("roomid", (*it)["roomid"]);
                 roomObject->set("name", (*it)["name"]);
-                // 如果没有描述，就不设置
+                roomObject->set("owner_id", (*it)["owner_id"]);
                 if (!(*it)["description"].isEmpty()) {
                     roomObject->set("description", (*it)["description"]);
                 }

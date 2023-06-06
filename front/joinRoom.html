@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Join Chatroom</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f2f2f2;
+    }
+    .form-container {
+      width: 60%;
+      margin: auto;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 18px;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button:hover {
+      background-color: #0069d9;
+    }
+  </style>
+</head>
+<body>
+<h1>Join Chatroom</h1>
+<div class="form-container">
+  <form id="joinChatroomForm">
+    <div class="form-group">
+      <label for="roomId">Chatroom ID:</label>
+      <input type="text" id="roomId" required>
+    </div>
+    <button type="submit" class="button">Join Chatroom</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('joinChatroomForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const jwt = localStorage.getItem('jwt');
+    const userId = parseInt(localStorage.getItem('id'), 10);
+    const roomId = document.getElementById('roomId').value;
+
+    fetch(`/api/v1/chatrooms/${roomId}/member`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': jwt,
+      },
+      body: JSON.stringify({
+        id: userId,
+      }),
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.code === 0) {
+                alert('Successfully joined chatroom!');
+                window.location.href = '/static/chatroom/chatroom.html';
+              } else {
+                alert('Failed to join chatroom: ' + data.msg);
+              }
+            });
+  });
+</script>
+
+</body>
+</html>
