@@ -10,6 +10,7 @@
       background-color: #f2f2f2;
     }
     .chatroom {
+      position: relative;
       background-color: white;
       margin: 10px;
       padding: 10px;
@@ -19,6 +20,12 @@
     }
     .chatroom h2, .chatroom p {
       display: inline-block; /* Make title and description side by side */
+    }
+    .chatroom-id {
+      position: absolute; /* Position absolutely inside .chatroom */
+      right: 10px; /* 10px from the right */
+      bottom: 10px; /* 10px from the bottom */
+      color: #888; /* Light gray color */
     }
     .button {
       padding: 10px 20px;
@@ -71,12 +78,13 @@
 <body>
 <h1>Chatrooms</h1>
 <div id="chatroomContainer"></div>
-<button id="addChatroom" class="button add">Add Chatroom</button>
+<button id="createChatroom" class="button add">Create Chatroom</button>
+<button id="joinChatroom" class="button add">Join Chatroom</button>
 
 <script>
   function loadChatrooms() {
     const jwt = localStorage.getItem('jwt');
-    const userId = localStorage.getItem('userId');
+    const userId = parseInt(localStorage.getItem('id'), 10);
 
     fetch('/api/v1/chatrooms', {
       headers: {
@@ -95,11 +103,12 @@
                                 <p>${chatroom.description}</p>
                                 <br> <!-- Added line break for buttons to be on a new line -->
                                 <button onclick="location.href='/chatroom/${chatroom.roomid}'" class="button enter">Enter Chatroom</button>
+                                <div class="chatroom-id">ID: ${chatroom.roomid}</div>
                             `;
                   document.getElementById('chatroomContainer').appendChild(div);
 
                   // Only add delete button if the user is the owner
-                  if (chatroom.owner_id == userId) {
+                  if (chatroom.owner_id === userId) {
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'button delete';
                     deleteButton.textContent = 'Delete Chatroom';
@@ -191,8 +200,13 @@
     btn.classList.remove('long-pressing');
   }
 
-  document.getElementById('addChatroom').addEventListener('click', function() {
+  document.getElementById('createChatroom').addEventListener('click', function() {
     window.location.href = '/static/chatroom/createRoom.html';
+  });
+
+  // Add event listener for 'joinChatroom' button
+  document.getElementById('joinChatroom').addEventListener('click', function() {
+    window.location.href = '/static/chatroom/joinRoom.html';
   });
 
   loadChatrooms();
