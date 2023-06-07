@@ -48,11 +48,20 @@ class ChatHTTPRequestHandler : public Poco::Net::HTTPRequestHandler {
   void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override ;
 };
 
+class ChatWSRequestHandler : public Poco::Net::HTTPRequestHandler {
+ public:
+  void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override ;
+};
+
 class ChatHTTPRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
  public:
   ChatHTTPRequestHandlerFactory() = default;
   Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
-    return new ChatHTTPRequestHandler;
+
+      if(request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0)
+          return new ChatWSRequestHandler;
+      else
+          return new ChatHTTPRequestHandler;
   }
 };
 
