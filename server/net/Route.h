@@ -83,7 +83,7 @@ inline std::vector<Route> routeTable{
              string jwt = request.get("Authorization", "");
              if (!jwt.empty())
                  jwt = jwt.substr(7);
-             Poco::JWT::Signer signer(CONST_CONFIG::kTokenSecret);
+             Poco::JWT::Signer signer(g_JWT_secret);
              Poco::JWT::Token token = signer.verify(jwt);
              //We only process situation that token is valid
              if (token.getExpiration() > Poco::Timestamp()) {
@@ -126,13 +126,12 @@ inline std::vector<Route> routeTable{
 
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
          auto v = verifyJwt(request, result);
-            if (v.has_value()) {
-                auto [id,string] = v.value();
-                result = DataFacade::getRoomList(id);
-                result->stringify(response.send());
-            }
-            else
-                result->stringify(response.send());
+         if (v.has_value()) {
+             auto [id, string] = v.value();
+             result = DataFacade::getRoomList(id);
+             result->stringify(response.send());
+         } else
+             result->stringify(response.send());
      }},
     // Create Chatroom
     {{"POST", std::regex("^/chatroom$")},
@@ -140,15 +139,14 @@ inline std::vector<Route> routeTable{
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
          auto v = verifyJwt(request, result);
          if (v.has_value()) {
-             auto [id,string] = v.value();
+             auto [id, string] = v.value();
              Poco::JSON::Parser parser;
              auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
              auto room_name = res->getValue<std::string>("name");
              auto room_description = res->getValue<std::string>("description");
              result = DataFacade::createRoom(id, room_name, room_description);
              result->stringify(response.send());
-         }
-         else
+         } else
              result->stringify(response.send());
 
      }},
@@ -165,6 +163,15 @@ inline std::vector<Route> routeTable{
          auto paths = std::vector<std::string>{};
          Poco::URI(request.getURI()).getPathSegments(paths);
          int room_id = std::stoi(paths[1]);
+
+         Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
+         auto v = verifyJwt(request, result);
+            if (v.has_value()) {
+                auto [id, string] = v.value();
+                result = DataFacade::getRoomMemberList(room_id, id);
+                result->stringify(response.send());
+            } else
+                result->stringify(response.send());
 
      }},
     // Update Chatroom Info

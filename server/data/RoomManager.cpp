@@ -120,4 +120,57 @@ Poco::JSON::Object::Ptr RoomManager::deleteRoom(int room_id) {
     Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
 
 }
+Poco::JSON::Object::Ptr RoomManager::getRoomMemberList(int room_id, int user_id) {
+    Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
+
+    try {
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+
+        // Check if the user is a member of the room
+        Poco::Data::Statement checkUser(session);
+        checkUser << "SELECT COUNT(*) FROM user_room_relation WHERE user_id = ? AND room_id = ?",
+            Poco::Data::Keywords::use(user_id), Poco::Data::Keywords::use(room_id),
+            Poco::Data::Keywords::now;
+        if (checkUser.execute() == 0) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_CLIENT_ERROR));
+            result->set("msg", "User is not a member of the room");
+            return result;
+        }
+
+        // Get the list of room members
+        Poco::Data::Statement select(session);
+        select << "SELECT users.id as userid, users.username as username FROM users "
+               << "INNER JOIN user_room_relation "
+               << "ON users.id = user_room_relation.user_id "
+               << "WHERE user_room_relation.room_id = ?",
+            Poco::Data::Keywords::use(room_id), Poco::Data::Keywords::now;
+
+        Poco::JSON::Array::Ptr membersList = new Poco::JSON::Array;
+        select.execute();
+        Poco::Data::RecordSet rs(select);
+
+        for (Poco::Data::RecordSet::Iterator it = rs.begin(); it != rs.end(); ++it) {
+            Poco::JSON::Object::Ptr memberObject = new Poco::JSON::Object;
+            memberObject->set("id", (*it)["userid"]);
+            memberObject->set("username", (*it)["username"]);
+            membersList->add(memberObject);
+        }
+
+        // Set the result data
+        Poco::JSON::Object::Ptr dataObject = new Poco::JSON::Object;
+        dataObject->set("members", membersList);
+        result->set("data", dataObject);
+        result->set("code", static_cast<int>(state_code::SUCCESS));
+        result->set("msg", "获取房间成员列表成功");
+
+    } catch (Poco::Exception &e) {
+        poco_error(Application::instance().logger(), e.displayText());
+        result->set("code", static_cast<int>(state_code::CHATROOM_SERVER_ERROR));
+        result->set("msg", "服务器错误");
+    }
+
+    return result;
+}
+
 

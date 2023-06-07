@@ -15,11 +15,18 @@ class MainServer : public Poco::Util::ServerApplication {
         string connectionString;
         if (Poco::Environment::has("DATABASE_CONFIG")) {
             connectionString = Poco::Environment::get("DATABASE_CONFIG");
-            std::cout<< connectionString << std::endl;
             Poco::Data::MySQL::Connector::registerConnector();
         } else {
             poco_error(logger(), "DATABASE_CONFIG not found");
             exit(1);
+        }
+        poco_information(logger(), "MySQL connected successfully");
+        if (Poco::Environment::has("JWT_SECRET")) {
+            poco_information(logger(), "JWT_SECRET found in environment");
+            g_JWT_secret = Poco::Environment::get("JWT_SECRET");
+        } else {
+            random_generate_JWT_secret();
+            poco_information(logger(), "JWT_SECRET random generated");
         }
 
         try {

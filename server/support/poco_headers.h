@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "const.h"
-
 #include "Poco/Net/HTTPServer.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/ServerSocket.h"
