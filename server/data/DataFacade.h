@@ -60,4 +60,12 @@ struct DataFacade {
         return Application::instance().getSubsystem<RoomManager>().getRoomMemberList(room_id,user_id);
     }
 
+    static Poco::JSON::Object::Ptr joinRoom(int room_id,int user_id) {
+        return Application::instance().getSubsystem<RoomManager>().joinRoom(room_id,user_id);
+    }
+
+    static Poco::JSON::Object::Ptr leaveRoom(int room_id,int user_id) {
+        return Application::instance().getSubsystem<RoomManager>().leaveRoom(room_id,user_id);
+    }
+
 };// namespace DataFacade

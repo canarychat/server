@@ -33,6 +33,10 @@ class RoomManager : public Poco::Util::Subsystem {
 
     Poco::JSON::Object::Ptr getRoomMemberList(int room_id,int user_id);
 
+    Poco::JSON::Object::Ptr joinRoom(int room_id,int user_id);
+
+    Poco::JSON::Object::Ptr leaveRoom(int room_id,int user_id);
+
   private:
 
 };

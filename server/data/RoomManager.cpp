@@ -172,5 +172,103 @@ Poco::JSON::Object::Ptr RoomManager::getRoomMemberList(int room_id, int user_id)
 
     return result;
 }
+Poco::JSON::Object::Ptr RoomManager::joinRoom(int room_id, int user_id) {
+    Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
+
+    try {
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+
+        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+
+        if (!p_user) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
+            result->set("msg", "用户不存在");
+            return result;
+        }
+
+        if (!p_room) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
+            result->set("msg", "房间不存在");
+            return result;
+        }
+
+        Poco::Data::Statement checkUser(session);
+        checkUser << "SELECT 1 FROM user_room_relation WHERE user_id = ? AND room_id = ?",
+            Poco::Data::Keywords::use(user_id), Poco::Data::Keywords::use(room_id),
+            Poco::Data::Keywords::now;
+
+        if (checkUser.execute() != 0) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_ADDUSER_FAILED_USER_ALREADY_IN));
+            result->set("msg", "用户已在房间内");
+            return result;
+        }
+
+        ChatRoomDB::UserRoomRelation::Ptr user_room_relation = new ChatRoomDB::UserRoomRelation;
+        user_room_relation->user_id(p_user);
+        user_room_relation->room_id(p_room);
+        user_room_relation->create(p_context);
+
+        result->set("code", static_cast<int>(state_code::SUCCESS));
+        result->set("msg", "加入房间成功");
+
+    } catch (Poco::Exception &e) {
+        poco_error(Application::instance().logger(), e.displayText());
+        result->set("code", static_cast<int>(state_code::CHATROOM_SERVER_ERROR));
+        result->set("msg", "服务器错误");
+    }
+    return result;
+}
+Poco::JSON::Object::Ptr RoomManager::leaveRoom(int room_id, int user_id) {
+    Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
+
+    try {
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+
+        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+
+        if (!p_user) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
+            result->set("msg", "用户不存在");
+            return result;
+        }
+
+        if (!p_room) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
+            result->set("msg", "房间不存在");
+            return result;
+        }
+
+
+        Poco::ActiveRecord::Query<ChatRoomDB::UserRoomRelation> query(p_context);
+        auto rs = query.where("user_id = ? AND room_id = ?").bind(user_id).bind(room_id).execute();
+        if (rs.empty()) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_DELETEUSER_FAILED_USER_NOT_IN));
+            result->set("msg", "用户不在房间内");
+            return result;
+        }
+        else {
+            rs[0]->remove();
+            //如果房间内没有人了，删除房间
+            //TODO::加入删除函数
+            result->set("code", static_cast<int>(state_code::SUCCESS));
+            result->set("msg", "离开房间成功");
+        }
+
+
+    } catch (Poco::Exception &e) {
+        poco_error(Application::instance().logger(), e.displayText());
+        result->set("code", static_cast<int>(state_code::CHATROOM_SERVER_ERROR));
+        result->set("msg", "服务器错误");
+    }
+    return result;
+}
+
+
+
+
 
 
