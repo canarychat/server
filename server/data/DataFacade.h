@@ -48,8 +48,8 @@ struct DataFacade {
         return Application::instance().getSubsystem<RoomManager>().createRoom(owner_id, std::move(room_name), std::move(room_description));
     }
 
-    static Poco::JSON::Object::Ptr deleteRoom(int room_id) {
-        return Application::instance().getSubsystem<RoomManager>().deleteRoom(room_id);
+    static Poco::JSON::Object::Ptr deleteRoom(int room_id,int user_id) {
+        return Application::instance().getSubsystem<RoomManager>().deleteRoom(room_id,user_id);
     }
 
     static Poco::JSON::Object::Ptr getRoomInfo(int room_id) {

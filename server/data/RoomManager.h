@@ -27,7 +27,7 @@ class RoomManager : public Poco::Util::Subsystem {
 
     Poco::JSON::Object::Ptr createRoom(int owner_id, std::string room_name, std::string description="");
 
-    Poco::JSON::Object::Ptr deleteRoom(int room_id);
+    Poco::JSON::Object::Ptr deleteRoom(int room_id,int user_id);
 
     Poco::JSON::Object::Ptr getRoomInfo(int room_id);
 
@@ -39,4 +39,5 @@ class RoomManager : public Poco::Util::Subsystem {
 
   private:
 
+    bool check_exit(Poco::JSON::Object::Ptr result,Poco::ActiveRecord::Context::Ptr, int room_id, int user_id);
 };
