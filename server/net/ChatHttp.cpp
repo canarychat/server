@@ -79,8 +79,12 @@ void ChatWSRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServerR
         Poco::Net::WebSocket ws(request, response);
         char buffer[1024];
         int flags;
-        int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
-        ws.sendFrame(buffer, n, flags);
+        while (true) {
+            int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+            ws.sendFrame(buffer, n, flags);
+            if ((flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_CLOSE)
+                break;
+        }
     } catch (Poco::Net::WebSocketException &exc) {
         // Handle WebSocket exception
         poco_information(Application::instance().logger(), exc.displayText());
