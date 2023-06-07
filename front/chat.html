@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            background-color: #f2f2f2;
+            display: flex;
+            height: 90vh;
+            box-sizing: border-box;
+            flex-direction: row;
+        }
+        #user-list {
+            flex: 1;
+            max-width: 20%;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 5px;
+            margin-right: 10px;
+            background-color: white;
+        }
+        #current-user {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: lightgray;
+        }
+        #current-user .status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #007BA7;
+            margin-right: 10px;
+        }
+        #message-area {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #message-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: white;
+            margin-bottom: 10px;
+        }
+        #input-area {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #input-area input {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .message .sender {
+            font-weight: bold;
+            color: blue;
+        }
+        .user {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="user-list">
+    <!-- User list will be dynamically added here -->
+    <div id="current-user">
+        <div class="status"></div>
+        <span id="current-username"><!-- Username will be added here --></span>
+    </div>
+</div>
+<div id="message-area">
+    <div id="message-list">
+        <!-- Messages will be dynamically added here -->
+    </div>
+    <div id="input-area">
+        <input type="text" id="message-input" placeholder="Type your message here..." />
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+    // Get room ID from local storage
+    var roomId = localStorage.getItem('room_id');
+    var username = localStorage.getItem('username'); // assuming username is stored in localStorage
+
+    // Update current user's username
+    document.getElementById('current-username').textContent = username;
+
+    // Fetch room member list
+    fetch('/api/v1/chatrooms/' + roomId + '/member',{
+        headers:{
+            'Authorization': localStorage.getItem('jwt'),
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            var userListDiv = document.getElementById('user-list');
+            data.data.members.forEach(member => {
+                if(member.username !== username){
+                    var userDiv = document.createElement('div');
+                    userDiv.classList.add('user');
+                    userDiv.textContent = member.username;
+                    userListDiv.appendChild(userDiv);
+                }
+            });
+        });
+
+    // Open websocket
+    var socket = new WebSocket('ws://api/v1/chatrooms/' + roomId + '/message');
+
+    // Display messages when they are received
+    socket.onmessage = function (event) {
+        var messageListDiv = document.getElementById('message-list');
+        var messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        messageDiv.textContent = event.data;
+        messageListDiv.appendChild(messageDiv);
+    };
+
+    // Send message when button is clicked
+    document.getElementById('send-button').onclick = function () {
+        var messageInput = document.getElementById('message-input');
+        socket.send(messageInput.value);
+        messageInput.value = '';
+    };
+</script>
+</body>
+</html>

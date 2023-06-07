@@ -63,6 +63,8 @@
 #include <Poco/Data/SessionPool.h>
 #include <Poco/Environment.h>
 #include <Poco/URI.h>
+#include <Poco/Net/WebSocket.h>
+#include <Poco/Net/NetException.h>
 
 
 
