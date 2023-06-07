@@ -4,11 +4,11 @@ USE ChatRoomDB;
 
 CREATE TABLE users
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    username   VARCHAR(255) NOT NULL UNIQUE,
-    password   VARCHAR(255) NOT NULL,
-    salt       CHAR(32) NOT NULL,
-    email      VARCHAR(255) UNIQUE NULL,
+    id          INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    username    VARCHAR(255)                          NOT NULL UNIQUE,
+    password    VARCHAR(255)                          NOT NULL,
+    salt        CHAR(32)                              NOT NULL,
+    email       VARCHAR(255) UNIQUE                   NULL,
     create_time DATE DEFAULT CURRENT_DATE,
     update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
@@ -16,10 +16,10 @@ CREATE TABLE users
 
 CREATE TABLE rooms
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY UNIQUE,
-    name       VARCHAR(255) NOT NULL,
+    id          INT AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    name        VARCHAR(255) NOT NULL,
     description VARCHAR(255) NULL,
-    owner_id   INT NOT NULL REFERENCES users (id),
+    owner_id    INT          NOT NULL REFERENCES users (id),
     create_time DATE DEFAULT CURRENT_DATE,
     update_time DATE DEFAULT CURRENT_DATE
 ) AUTO_INCREMENT = 1000;
@@ -36,11 +36,12 @@ CREATE TABLE user_room_relation
 
 CREATE TABLE messages
 (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id    INT,
-    room_id    INT,
-    message    TEXT,
-    create_time DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (user_id) REFERENCES users (id),
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT,
+    room_id   INT,
+    type      VARCHAR(20),
+    content   TEXT,
+    timestamp INT,
+    FOREIGN KEY (sender_id) REFERENCES users (id),
     FOREIGN KEY (room_id) REFERENCES rooms (id)
 );

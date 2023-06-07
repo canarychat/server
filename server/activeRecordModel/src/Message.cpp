@@ -16,129 +16,131 @@ namespace ChatRoomDB {
 
 
 Message::Message(ID id):
-	Poco::ActiveRecord::ActiveRecord<Poco::Int64>(id)
+    Poco::ActiveRecord::ActiveRecord<Poco::Int64>(id)
 {
 }
 
 
 Message::Message(const Message& other):
-	Poco::ActiveRecord::ActiveRecord<Poco::Int64>(other),
-	_user_id(other._user_id),
-	_room_id(other._room_id),
-	_message(other._message),
-	_create_time(other._create_time)
+    Poco::ActiveRecord::ActiveRecord<Poco::Int64>(other),
+    _sender_id(other._sender_id),
+    _room_id(other._room_id),
+    _type(other._type),
+    _content(other._content),
+    _timestamp(other._timestamp)
 {
 }
 
 
-User::Ptr Message::user_id() const
+User::Ptr Message::sender_id() const
 {
-	return User::find(context(), _user_id);
+    return User::find(context(), _sender_id);
 }
 
 
-Message& Message::user_id(User::Ptr pObject)
+Message& Message::sender_id(User::Ptr pObject)
 {
-	if (pObject)
-		_user_id = pObject->id();
-	else
-		_user_id = User::INVALID_ID;
-	return *this;
+    if (pObject)
+        _sender_id = pObject->id();
+    else
+        _sender_id = User::INVALID_ID;
+    return *this;
 }
 
 
 Room::Ptr Message::room_id() const
 {
-	return Room::find(context(), _room_id);
+    return Room::find(context(), _room_id);
 }
 
 
 Message& Message::room_id(Room::Ptr pObject)
 {
-	if (pObject)
-		_room_id = pObject->id();
-	else
-		_room_id = Room::INVALID_ID;
-	return *this;
+    if (pObject)
+        _room_id = pObject->id();
+    else
+        _room_id = Room::INVALID_ID;
+    return *this;
 }
 
 
 Message::Ptr Message::find(Poco::ActiveRecord::Context::Ptr pContext, const ID& id)
 {
-	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(pContext->statementPlaceholderProvider());
-	Message::Ptr pObject(new Message);
+    Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(pContext->statementPlaceholderProvider());
+    Message::Ptr pObject(new Message);
 
-	pContext->session()
-		<< "SELECT id, user_id, room_id, message, create_time"
-		<< "  FROM messages"
-		<< "  WHERE id = " << pSPP->next(),
-		into(pObject->mutableID()),
-		into(*pObject),
-		bind(id),
-		now;
+    pContext->session()
+        << "SELECT id, sender_id, room_id, type, content, timestamp"
+        << "  FROM messages"
+        << "  WHERE id = " << pSPP->next(),
+        into(pObject->mutableID()),
+        into(*pObject),
+        bind(id),
+        now;
 
-	return withContext(pObject, pContext);
+    return withContext(pObject, pContext);
 }
 
 
 void Message::insert()
 {
-	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
+    Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
-	context()->session()
-		<< "INSERT INTO messages (id, user_id, room_id, message, create_time)"
-		<< "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
-		use(*this),
-		now;
-	updateID(context()->session());
+    context()->session()
+        << "INSERT INTO messages (id, sender_id, room_id, type, content, timestamp)"
+        << "  VALUES (NULL, " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ", " << pSPP->next() << ")",
+        use(*this),
+        now;
+    updateID(context()->session());
 }
 
 
 void Message::update()
 {
-	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
+    Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
-	context()->session()
-		<< "UPDATE messages"
-		<< "  SET user_id = " << pSPP->next() << ", room_id = " << pSPP->next() << ", message = " << pSPP->next() << ", create_time = " << pSPP->next()
-		<< "  WHERE id = " << pSPP->next(),
-		use(*this),
-		bind(id()),
-		now;
+    context()->session()
+        << "UPDATE messages"
+        << "  SET sender_id = " << pSPP->next() << ", room_id = " << pSPP->next() << ", type = " << pSPP->next() << ", content = " << pSPP->next() << ", timestamp = " << pSPP->next()
+        << "  WHERE id = " << pSPP->next(),
+        use(*this),
+        bind(id()),
+        now;
 }
 
 
 void Message::remove()
 {
-	Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
+    Poco::ActiveRecord::StatementPlaceholderProvider::Ptr pSPP(context()->statementPlaceholderProvider());
 
-	context()->session()
-		<< "DELETE FROM messages"
-		<< "  WHERE id = " << pSPP->next(),
-		bind(id()),
-		now;
+    context()->session()
+        << "DELETE FROM messages"
+        << "  WHERE id = " << pSPP->next(),
+        bind(id()),
+        now;
 }
 
 
 const std::vector<std::string>& Message::columns()
 {
-	static const std::vector<std::string> cols =
-	{
-		"id"s,
-		"user_id"s,
-		"room_id"s,
-		"message"s,
-		"create_time"s,
-	};
+    static const std::vector<std::string> cols =
+        {
+            "id"s,
+            "sender_id"s,
+            "room_id"s,
+            "type"s,
+            "content"s,
+            "timestamp"s,
+        };
 
-	return cols;
+    return cols;
 }
 
 
 const std::string& Message::table()
 {
-	static const std::string t = "messages";
-	return t;
+    static const std::string t = "messages";
+    return t;
 }
 
 

@@ -25,10 +25,12 @@
     </class>
 
     <class name="Message" table="messages" autoIncrementID="true">
-        <property name="id" type="int64"/>
-        <property name="user_id" type="int32" references="User"/>
-        <property name="room_id" type="int32" references="Room"/>
-        <property name="message" type="string"/>
-        <property name="create_time" type="date"/>
+        <property name="id" column="id" type="int64" primaryKey="true" autoIncrement="true"/>
+        <property name="sender_id" column="sender_id" type="int32" references="User"/>
+        <property name="room_id" column="room_id" type="int32" references="Room"/>
+        <property name="type" column="type" type="string" />
+        <property name="content" column="content" type="string"/>
+        <property name="timestamp" column="timestamp" type="int64"/>
     </class>
+
 </project>

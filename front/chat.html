@@ -114,14 +114,14 @@
 </div>
 
 <script>
-    // Get room ID from local storage
     var roomId = localStorage.getItem('room_id');
-    var username = localStorage.getItem('username'); // assuming username is stored in localStorage
+    var username = localStorage.getItem('username');
+    var userId = localStorage.getItem('id');
+    var jwt = localStorage.getItem('jwt');
 
-    // Update current user's username
     document.getElementById('current-username').textContent = username;
 
-    // Fetch room member list
+    // Fetch room member list and append to user list
     fetch('/api/v1/chatrooms/' + roomId + '/member',{
         headers:{
             'Authorization': localStorage.getItem('jwt'),
@@ -140,22 +140,47 @@
             });
         });
 
-    // Open websocket
-    var socket = new WebSocket('ws://api/v1/chatrooms/' + roomId + '/message');
+    var socketUrl = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/v1/chatrooms/' + roomId + '/message';
+    var socket = new WebSocket(socketUrl);
 
-    // Display messages when they are received
+    socket.onopen = function () {
+        // Send authorization message when connection is open
+        var authMessage = {
+            sender: {
+                id: userId,
+                name: username
+            },
+            type: "Authorization/jwt",
+            content: jwt
+        };
+        socket.send(JSON.stringify(authMessage));
+    };
+
     socket.onmessage = function (event) {
         var messageListDiv = document.getElementById('message-list');
+        var messageData = JSON.parse(event.data);
+
+        // Ignore authorization confirmation message
+        if(messageData.type === "Authorization/jwt") return;
+
         var messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
-        messageDiv.textContent = event.data;
+        messageDiv.textContent = messageData.sender.name + ': ' + messageData.content;
         messageListDiv.appendChild(messageDiv);
     };
 
-    // Send message when button is clicked
     document.getElementById('send-button').onclick = function () {
         var messageInput = document.getElementById('message-input');
-        socket.send(messageInput.value);
+
+        var message = {
+            sender: {
+                id: userId,
+                name: username
+            },
+            type: "text/plain",
+            content: messageInput.value
+        };
+        socket.send(JSON.stringify(message));
         messageInput.value = '';
     };
 </script>
