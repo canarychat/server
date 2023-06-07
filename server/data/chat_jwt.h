@@ -5,10 +5,26 @@
 #pragma once
 
 #include <optional>
-#include "poco_headers.h"
+
+inline string g_JWT_secret;
+
+inline void random_generate_JWT_secret(){
+    std::string salt;
+    Poco::RandomInputStream rng;
+    for (size_t i = 0; i < 24; ++i) {
+        char c;
+        rng >> c;
+        salt += c;
+    }
+    std::stringstream ss;
+    Poco::Base64Encoder base64Encoder(ss);
+    base64Encoder << salt;
+    base64Encoder.close();  // 关闭编码器以刷新任何缓冲的数据
+    g_JWT_secret = ss.str();
+}
 
 inline std::string setJWT ( const int& user_id,const std::string& username){
-    Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
+    Poco::JWT::Signer signer{g_JWT_secret};
     Poco::JWT::Token token;
     token.setIssuer("charServerLambert");
     token.payload().set("username", username);
@@ -20,11 +36,11 @@ inline std::string setJWT ( const int& user_id,const std::string& username){
     return jwt;
 }
 
-inline std::optional<std::tuple<int,string>> verifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &responseObject) {
+ inline std::optional<std::tuple<int,string>> verifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &responseObject) {
     try {
-        if (request.has("Authorization")) {
-            auto jwt = request.get("Authorization", "").substr(7);
-            Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
+        if (auto jwt =request.get("Authorization", "");jwt.substr(0, 7) == "Bearer ") {
+            jwt = jwt.substr(7);
+            Poco::JWT::Signer signer{g_JWT_secret};
             Poco::JWT::Token token = signer.verify(jwt);
             int id = token.payload().get("user_id");
             Poco::Dynamic::Var user_name = token.payload().get("username");
