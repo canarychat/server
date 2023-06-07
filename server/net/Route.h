@@ -166,12 +166,12 @@ inline std::vector<Route> routeTable{
 
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
          auto v = verifyJwt(request, result);
-            if (v.has_value()) {
-                auto [id, string] = v.value();
-                result = DataFacade::getRoomMemberList(room_id, id);
-                result->stringify(response.send());
-            } else
-                result->stringify(response.send());
+         if (v.has_value()) {
+             auto [id, string] = v.value();
+             result = DataFacade::getRoomMemberList(room_id, id);
+             result->stringify(response.send());
+         } else
+             result->stringify(response.send());
 
      }},
     // Update Chatroom Info
@@ -187,13 +187,59 @@ inline std::vector<Route> routeTable{
     // Add Chatroom Member
     {{"POST", std::regex("^/chatrooms/\\d+/member$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
-         // handle add chatroom member request
+         Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
+
+         auto v = verifyJwt(request, result);
+         if (v.has_value()) {
+             auto [id, string] = v.value();
+
+             auto paths = std::vector<std::string>{};
+             Poco::URI(request.getURI()).getPathSegments(paths);
+             int room_id = std::stoi(paths[1]);
+
+             Poco::JSON::Parser parser;
+             auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
+             auto member_id = res->getValue<int>("id");
+
+             if (member_id != id) {
+                 response.setStatus(HTTPResponse::HTTP_FORBIDDEN);
+                 response.send();
+                 return;
+             }
+             result = DataFacade::joinRoom(room_id, member_id);
+             result->stringify(response.send());
+         } else
+             result->stringify(response.send());
      }},
+
     // Delete Chatroom Member
-    {{"DELETE", std::regex("^/chatrooms/\\d+/member$")},
+    {{"DELETE", std::regex("^/chatrooms/(\\d+)/member$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
-         // handle delete chatroom member request
+         Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
+
+         auto v = verifyJwt(request, result);
+         if (v.has_value()) {
+             auto [id, string] = v.value();
+
+             auto paths = std::vector<std::string>{};
+             Poco::URI(request.getURI()).getPathSegments(paths);
+             int room_id = std::stoi(paths[1]);
+
+             Poco::JSON::Parser parser;
+             auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
+             auto member_id = res->getValue<int>("id");
+
+             if (member_id != id) {
+                 response.setStatus(HTTPResponse::HTTP_FORBIDDEN);
+                 response.send();
+                 return;
+             }
+             result = DataFacade::leaveRoom(room_id, member_id);
+             result->stringify(response.send());
+         } else
+             result->stringify(response.send());
      }},
+
     // Get Users List
     {{"GET", std::regex("^/users$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {

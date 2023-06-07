@@ -132,7 +132,7 @@
   function leaveChatroom(id) {
     if (confirm('Are you sure you want to leave this chatroom?')) {
       const jwt = localStorage.getItem('jwt');
-      const userId = localStorage.getItem('userId');
+      const userId = localStorage.getItem('id');
       fetch(`/api/v1/chatrooms/${id}/member`, {
         method: 'DELETE',
         headers: {
