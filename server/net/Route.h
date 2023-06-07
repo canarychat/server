@@ -182,7 +182,20 @@ inline std::vector<Route> routeTable{
     // Delete Chatroom
     {{"DELETE", std::regex("^/chatrooms/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
-         // handle delete chatroom request
+         Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
+
+         auto v = verifyJwt(request, result);
+         if (v.has_value()) {
+             auto [user_id, string] = v.value();
+
+             auto paths = std::vector<std::string>{};
+             Poco::URI(request.getURI()).getPathSegments(paths);
+             int room_id = std::stoi(paths[1]);
+
+             result = DataFacade::deleteRoom(room_id, user_id);
+             result->stringify(response.send());
+         } else
+             result->stringify(response.send());
      }},
     // Add Chatroom Member
     {{"POST", std::regex("^/chatrooms/\\d+/member$")},

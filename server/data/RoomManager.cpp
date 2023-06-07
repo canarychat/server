@@ -116,16 +116,17 @@ Poco::JSON::Object::Ptr RoomManager::createRoom(int owner_id, std::string room_n
     return
         result;
 }
-Poco::JSON::Object::Ptr RoomManager::deleteRoom(int room_id) {
-    Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
 
-}
 Poco::JSON::Object::Ptr RoomManager::getRoomMemberList(int room_id, int user_id) {
     Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
 
     try {
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+
+        if (!check_exit(result, p_context, room_id, user_id)) {
+            return result;
+        }
 
         // Check if the user is a member of the room
         Poco::Data::Statement checkUser(session);
@@ -180,17 +181,16 @@ Poco::JSON::Object::Ptr RoomManager::joinRoom(int room_id, int user_id) {
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
 
         auto p_room = ChatRoomDB::Room::find(p_context, room_id);
-        auto p_user = ChatRoomDB::User::find(p_context, user_id);
-
-        if (!p_user) {
-            result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
-            result->set("msg", "用户不存在");
-            return result;
-        }
-
         if (!p_room) {
             result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
             result->set("msg", "房间不存在");
+            return result;
+        }
+
+        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        if (!p_user) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
+            result->set("msg", "用户不存在");
             return result;
         }
 
@@ -227,21 +227,9 @@ Poco::JSON::Object::Ptr RoomManager::leaveRoom(int room_id, int user_id) {
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
 
-        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
-        auto p_user = ChatRoomDB::User::find(p_context, user_id);
-
-        if (!p_user) {
-            result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
-            result->set("msg", "用户不存在");
+        if (!check_exit(result, p_context, room_id, user_id)) {
             return result;
         }
-
-        if (!p_room) {
-            result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
-            result->set("msg", "房间不存在");
-            return result;
-        }
-
 
         Poco::ActiveRecord::Query<ChatRoomDB::UserRoomRelation> query(p_context);
         auto rs = query.where("user_id = ? AND room_id = ?").bind(user_id).bind(room_id).execute();
@@ -249,15 +237,18 @@ Poco::JSON::Object::Ptr RoomManager::leaveRoom(int room_id, int user_id) {
             result->set("code", static_cast<int>(state_code::CHATROOM_DELETEUSER_FAILED_USER_NOT_IN));
             result->set("msg", "用户不在房间内");
             return result;
-        }
-        else {
+        } else {
             rs[0]->remove();
-            //如果房间内没有人了，删除房间
-            //TODO::加入删除函数
+            //如果房间内没有人了，删除房间，虽然目前不可能出现，因为房主不能退出房间
+            Poco::ActiveRecord::Query<ChatRoomDB::UserRoomRelation> delete_query(p_context);
+            auto exist_rs= delete_query.where("room_id = ?").bind(room_id).execute();
+            if (exist_rs.empty()) {
+                ChatRoomDB::Room::Ptr room = ChatRoomDB::Room::find(p_context, room_id);
+                room->remove();
+            }
             result->set("code", static_cast<int>(state_code::SUCCESS));
             result->set("msg", "离开房间成功");
         }
-
 
     } catch (Poco::Exception &e) {
         poco_error(Application::instance().logger(), e.displayText());
@@ -266,8 +257,69 @@ Poco::JSON::Object::Ptr RoomManager::leaveRoom(int room_id, int user_id) {
     }
     return result;
 }
+Poco::JSON::Object::Ptr RoomManager::deleteRoom(int room_id, int user_id) {
+    Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
 
+    try {
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
 
+        if (!check_exit(result, p_context, room_id, user_id)) {
+            return result;
+        }
+
+        ChatRoomDB::Room::Ptr p_room = ChatRoomDB::Room::find(p_context, room_id);
+
+        if (p_room->owner_idID() != user_id) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_DELETE_NOT_OWNER));
+            result->set("msg", "用户不是房间所有者");
+            return result;
+        }
+
+        // Delete all user-room relations for this room
+        Poco::Data::Statement deleteRelations(session);
+        deleteRelations << "DELETE FROM user_room_relation WHERE room_id = ?",
+            Poco::Data::Keywords::use(room_id), Poco::Data::Keywords::now;
+        deleteRelations.execute();
+
+        // Delete the room
+        p_room->remove();
+
+        result->set("code", static_cast<int>(state_code::SUCCESS));
+        result->set("msg", "删除房间成功");
+
+    } catch (Poco::Exception &e) {
+        poco_error(Application::instance().logger(), e.displayText());
+        result->set("code", static_cast<int>(state_code::CHATROOM_SERVER_ERROR));
+        result->set("msg", "服务器错误");
+    }
+
+    return result;
+}
+bool RoomManager::check_exit(Poco::JSON::Object::Ptr result,
+                             Poco::ActiveRecord::Context::Ptr p_context,
+                             int room_id = 0,
+                             int user_id = 0) {
+    if (room_id != 0) {
+        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        if (!p_room) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
+            result->set("msg", "房间不存在");
+            return false;
+        }
+    }
+
+    if (user_id != 0) {
+        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        if (!p_user) {
+            result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
+            result->set("msg", "用户不存在");
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
 
