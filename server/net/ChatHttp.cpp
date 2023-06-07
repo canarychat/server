@@ -36,11 +36,11 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
   Application &app = Application::instance();
   auto request_method = request.getMethod();
   auto request_uri = request.getURI();
-  poco_information_f2(app.logger(), "request method: %s request uri: %s", request_method, request_uri);
+  auto request_host = request.getHost();
+  poco_information_f3(app.logger(), "request method: %s, uri: %s, host: %s", request_method, request_uri, request_host);
   for (const auto &route : routeTable) {
     std::regex route_regex(route.first.pattern);
-    std::smatch match_result;
-    if (route.first.requestType==request_method&& std::regex_match(request_uri, match_result, route_regex)) {
+    if (route.first.requestType==request_method&& std::regex_match(request_uri,route_regex)) {
       route.second(request, response);
       return;
     }

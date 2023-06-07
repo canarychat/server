@@ -27,6 +27,8 @@ class RoomManager : public Poco::Util::Subsystem {
 
     Poco::JSON::Object::Ptr createRoom(int owner_id, std::string room_name, std::string description="");
 
+    Poco::JSON::Object::Ptr deleteRoom(int room_id);
+
   private:
 
 };

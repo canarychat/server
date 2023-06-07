@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include "poco_headers.h"
 
 inline std::string setJWT ( const int& user_id,const std::string& username){
@@ -19,20 +20,22 @@ inline std::string setJWT ( const int& user_id,const std::string& username){
     return jwt;
 }
 
-//inline std::tuple<int, std::string> getJWT (const std::string& jwt_){
-//    int id;
-//    Poco::Dynamic::Var user_name;
-//    try {
-//        string jwt = jwt_.substr(7);
-//        Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
-//        Poco::JWT::Token token = signer.verify(jwt);
-//        id = token.payload().get("user_id");
-//        user_name = token.payload().get("username");
-//    }
-//    catch (Poco::Exception &e) {
-//        Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-//        json->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
-//        json->set("msg", "JWT验证失败");
-//        json->stringify(response.send());
-//    }
-//}
+inline std::optional<std::tuple<int,string>> verifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &responseObject) {
+    try {
+        if (request.has("Authorization")) {
+            auto jwt = request.get("Authorization", "").substr(7);
+            Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
+            Poco::JWT::Token token = signer.verify(jwt);
+            int id = token.payload().get("user_id");
+            Poco::Dynamic::Var user_name = token.payload().get("username");
+            return std::make_tuple(id, user_name.toString());
+        } else {
+            throw Poco::Exception("No Authorization");
+        }
+    } catch (Poco::Exception &e) {
+        responseObject = new Poco::JSON::Object();
+        responseObject->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
+        responseObject->set("msg", "JWT验证失败");
+        return std::nullopt;
+    }
+}

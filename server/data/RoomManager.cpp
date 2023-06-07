@@ -116,4 +116,8 @@ Poco::JSON::Object::Ptr RoomManager::createRoom(int owner_id, std::string room_n
     return
         result;
 }
+Poco::JSON::Object::Ptr RoomManager::deleteRoom(int room_id) {
+    Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
+
+}
 

@@ -49,7 +49,7 @@
         var password = document.getElementById('password').value;
         var email = document.getElementById('email').value;
 
-        fetch('http://localhost/api/v1/register', {
+        fetch('/api/v1/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

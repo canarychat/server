@@ -64,6 +64,7 @@
 #include <Poco/Data/Statement.h>
 #include <Poco/Data/SessionPool.h>
 #include <Poco/Environment.h>
+#include <Poco/URI.h>
 
 
 
@@ -90,3 +91,5 @@ using Poco::ActiveRecord::Context;
 using Poco::ActiveRecord::Query;
 
 using std::string;
+
+#include <optional>
