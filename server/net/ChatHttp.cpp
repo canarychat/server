@@ -38,6 +38,9 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
   auto request_uri = request.getURI();
   auto request_host = request.getHost();
   poco_information_f3(app.logger(), "request method: %s, uri: %s, host: %s", request_method, request_uri, request_host);
+
+  response.set("server", "Lambert's ChatServer/api/v1");
+
   for (const auto &route : routeTable) {
     std::regex route_regex(route.first.pattern);
     if (route.first.requestType==request_method&& std::regex_match(request_uri,route_regex)) {
