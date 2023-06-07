@@ -29,4 +29,8 @@ enum class state_code {
 
     CHATROOM_CLIENT_ERROR = 251,
 
+    CHATROOM_MEMBER_SERVER_ERROR = 310,
+
+    ROOM_MEMBER_CLIENT_ERROR = 351,
+
 };

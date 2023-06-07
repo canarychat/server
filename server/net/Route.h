@@ -25,7 +25,7 @@ inline DataManager &DM_instance() {
 inline std::vector<Route> routeTable{
     //CORS
     {
-        {"OPTIONS", std::regex("/.*")},
+        {"OPTIONS", std::regex("^/.*")},
         [](HTTPServerRequest &request, HTTPServerResponse &response) {
             // 设置CORS响应头
 //          poco_debug_f1(Application::instance().logger(), "request.getURI() = %s", request.getURI());
@@ -41,7 +41,7 @@ inline std::vector<Route> routeTable{
     },
 
     // Register
-    {{"POST", std::regex("/register")},
+    {{"POST", std::regex("^/register$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          poco_debug_f1(Application::instance().logger(), "request.getURI() = %s", request.getURI());
          response.add("Access-Control-Allow-Origin", "*");
@@ -70,7 +70,7 @@ inline std::vector<Route> routeTable{
 
 
     // Login
-    {{"POST", std::regex("/login")},
+    {{"POST", std::regex("^/login$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle login request
          response.setContentType("application/json");
@@ -121,108 +121,91 @@ inline std::vector<Route> routeTable{
 
      }},
     // Get ChatRooms List
-    {{"GET", std::regex("/chatrooms")},
+    {{"GET", std::regex("^/chatrooms$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
 
-         int id;
-         Poco::Dynamic::Var user_name;
-         try {
-             auto jwt = request.get("Authorization", "").substr(7);
-             Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
-             Poco::JWT::Token token = signer.verify(jwt);
-             id = token.payload().get("user_id");
-             user_name = token.payload().get("username");
-             response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
-         }
-         catch (Poco::Exception &e) {
-             Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-             json->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
-             json->set("msg", "JWT验证失败");
-             json->stringify(response.send());
-         }
-
-         Poco::JSON::Object::Ptr result = DataFacade::getRoomList(id);
-         result->stringify(response.send());
+         Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
+         auto v = verifyJwt(request, result);
+            if (v.has_value()) {
+                auto [id,string] = v.value();
+                result = DataFacade::getRoomList(id);
+                result->stringify(response.send());
+            }
+            else
+                result->stringify(response.send());
      }},
     // Create Chatroom
-    {{"POST", std::regex("/chatroom")},
+    {{"POST", std::regex("^/chatroom$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
-         int id;
-         try {
-             auto jwt = request.get("Authorization", "").substr(7);
-             Poco::JWT::Signer signer{CONST_CONFIG::kTokenSecret};
-             Poco::JWT::Token token = signer.verify(jwt);
-             id = token.payload().get("user_id");
-             response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+         Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
+         auto v = verifyJwt(request, result);
+         if (v.has_value()) {
+             auto [id,string] = v.value();
+             Poco::JSON::Parser parser;
+             auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
+             auto room_name = res->getValue<std::string>("name");
+             auto room_description = res->getValue<std::string>("description");
+             result = DataFacade::createRoom(id, room_name, room_description);
+             result->stringify(response.send());
          }
-         catch (Poco::Exception &e) {
-             Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-             json->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
-             json->set("msg", "JWT验证失败");
-             json->stringify(response.send());
-         }
-
-         Poco::JSON::Parser parser;
-         auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
-         auto room_name = res->getValue<string>("name");
-         auto room_description = res->getValue<string>("description");
-         Poco::JSON::Object::Ptr result = DataFacade::createRoom(id, room_name, room_description);
-         result->stringify(response.send());
+         else
+             result->stringify(response.send());
 
      }},
     // Get Chatroom Info
-    {{"GET", std::regex("/chatrooms/.+")},
+    {{"GET", std::regex("^/chatrooms/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle get chatroom info request
+         std::cout << "get chatroom info" << std::endl;
      }},
     // Get Chatroom Member Info
-    {{"GET", std::regex("/chatrooms/.+/member")},
+    {{"GET", std::regex("^/chatrooms/(\\d+)/member$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle get chatroom member info request
+         auto paths = std::vector<std::string>{};
+         Poco::URI(request.getURI()).getPathSegments(paths);
+         int room_id = std::stoi(paths[1]);
+
      }},
     // Update Chatroom Info
-    {{"PUT", std::regex("/chatrooms/.+")},
+    {{"PUT", std::regex("^/chatrooms/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle update chatroom info request
      }},
     // Delete Chatroom
-    {{"DELETE", std::regex("/chatrooms/.+")},
+    {{"DELETE", std::regex("^/chatrooms/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle delete chatroom request
      }},
     // Add Chatroom Member
-    {{"POST", std::regex("/chatrooms/.+/member")},
+    {{"POST", std::regex("^/chatrooms/\\d+/member$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle add chatroom member request
      }},
     // Delete Chatroom Member
-    {{"DELETE", std::regex("/chatrooms/.+/member")},
+    {{"DELETE", std::regex("^/chatrooms/\\d+/member$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle delete chatroom member request
      }},
     // Get Users List
-    {{"GET", std::regex("/users")},
+    {{"GET", std::regex("^/users$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle get users list request
      }},
     // Get User Info
-    {{"GET", std::regex("/users/.+")},
+    {{"GET", std::regex("^/users/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle get user info request
      }},
     // Update User Info
-    {{"PUT", std::regex("/users/.+")},
+    {{"PUT", std::regex("^/users/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle update user info request
      }},
     // Delete User
-    {{"DELETE", std::regex("/users/.+")},
+    {{"DELETE", std::regex("^/users/\\d+$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          // handle delete user request
-     }},
-    // Index Entrance
-    {{"GET", std::regex("/")},
-     [](HTTPServerRequest &request, HTTPServerResponse &response) {
-         // handle index entrance request
      }}
 };
+
