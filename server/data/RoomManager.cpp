@@ -129,7 +129,7 @@ Poco::JSON::Object::Ptr RoomManager::getRoomMemberList(int room_id, int user_id)
 
         // Check if the user is a member of the room
         Poco::Data::Statement checkUser(session);
-        checkUser << "SELECT COUNT(*) FROM user_room_relation WHERE user_id = ? AND room_id = ?",
+        checkUser << "SELECT 1 FROM user_room_relation WHERE user_id = ? AND room_id = ?",
             Poco::Data::Keywords::use(user_id), Poco::Data::Keywords::use(room_id),
             Poco::Data::Keywords::now;
         if (checkUser.execute() == 0) {
