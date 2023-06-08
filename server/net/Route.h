@@ -7,12 +7,14 @@
 #include <string>
 #include <functional>
 #include <regex>
+#include <utility>
 
 #include "poco_headers.h"
 #include "DataManager.h"
 #include "chat_http_jwt.h"
 #include "state_code.h"
 #include "DataFacade.h"
+#include "MsgFacade.h"
 
 struct RouteKey {
     string requestType;
@@ -275,3 +277,11 @@ inline std::vector<Route> routeTable{
      }}
 };
 
+
+
+
+inline std::map<std::string, std::function<void(Poco::JSON::Object::Ptr, Poco::JSON::Object::Ptr)>> WS_HandlerMap = {
+    {"text/plain", [](Poco::JSON::Object::Ptr recv_json, Poco::JSON::Object::Ptr send_json) {
+        MsgFacade::sendMsg(std::move(recv_json), std::move(send_json));
+    }},
+};

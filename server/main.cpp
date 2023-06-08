@@ -6,7 +6,7 @@
 #include "ChatHttp.h"
 
 #include "support/poco_headers.h"
-#include "MessageManager.h"
+#include "chat_http_jwt.h"
 
 class MainServer : public Poco::Util::ServerApplication {
   public:
