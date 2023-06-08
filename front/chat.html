@@ -232,7 +232,11 @@
 
                         const statusDotDiv = document.createElement('div');
                         statusDotDiv.classList.add('status-dot');
-                        statusDotDiv.style.backgroundColor = getColor(member.id);  // 为每个用户分配颜色
+                        if (member.id === parseInt(userId, 10)) {
+                            statusDotDiv.style.backgroundColor = 'green';  // 当前用户为绿色
+                        } else {
+                            statusDotDiv.style.backgroundColor = getColor(member.id);  // 为每个用户分配颜色
+                        }
 
                         userDiv.appendChild(statusDotDiv);
                         userDiv.appendChild(userSpan);

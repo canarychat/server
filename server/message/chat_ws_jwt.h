@@ -6,14 +6,14 @@
 #include <optional>
 #include "state_code.h"
 
-inline std::optional<std::tuple<int, std::string>> VerifyJwt(Poco::JSON::Object::Ptr &recvObject,
-                                                             Poco::JSON::Object::Ptr &sendObject) {
+inline std::optional<std::tuple<int, std::string>> VerifyJwt(Poco::JSON::Object::Ptr &recv_object,
+                                                             Poco::JSON::Object::Ptr &send_object) {
     try {
-        if (!recvObject->has("type") || recvObject->getValue<std::string>("type") != "Authorization/jwt") {
+        if (!recv_object->has("type") || recv_object->getValue<std::string>("type") != "Authorization/jwt") {
             throw Poco::Exception("No Authorization");
         }
 
-        auto content = recvObject->getValue<std::string>("content");
+        auto content = recv_object->getValue<std::string>("content");
 
         if (content.substr(0, 7) == "Bearer ") {
             std::string jwt = content.substr(7);
@@ -25,14 +25,14 @@ inline std::optional<std::tuple<int, std::string>> VerifyJwt(Poco::JSON::Object:
             string user_name = token.payload().get("username");
 
             // Create success message
-            sendObject->set("type", "Authorization/jwt");
-            sendObject->set("timestamp", static_cast<int>(Poco::Timestamp().epochTime()));
+            send_object->set("type", "Authorization/jwt");
+            send_object->set("timestamp", static_cast<int>(Poco::Timestamp().epochTime()));
             {
                 Poco::JSON::Object::Ptr sender{new Poco::JSON::Object};
 
                 sender->set("id", 100);
                 sender->set("name", "server");
-                sendObject->set("sender", sender);
+                send_object->set("sender", sender);
             }
 
             {
@@ -40,7 +40,7 @@ inline std::optional<std::tuple<int, std::string>> VerifyJwt(Poco::JSON::Object:
 
                 content->set("code", 0);
                 content->set("msg", "JWT verified!");
-                sendObject->set("content", content);
+                send_object->set("content", content);
             }
 
             return std::make_tuple(id, user_name);
@@ -51,21 +51,21 @@ inline std::optional<std::tuple<int, std::string>> VerifyJwt(Poco::JSON::Object:
     } catch (Poco::Exception &e) {
         // Create failure message
         poco_information_f1(Application::instance().logger(), "JWT verification failed: %s", e.what());
-        sendObject->set("type", "Authorization/jwt");
-        sendObject->set("timestamp", static_cast<int>(Poco::Timestamp().epochTime()));
+        send_object->set("type", "Authorization/jwt");
+        send_object->set("timestamp", static_cast<int>(Poco::Timestamp().epochTime()));
         {
             Poco::JSON::Object::Ptr sender{new Poco::JSON::Object};
 
             sender->set("id", 100);
             sender->set("name", "server");
-            sendObject->set("sender", sender);
+            send_object->set("sender", sender);
         }
         {
             Poco::JSON::Object::Ptr content{new Poco::JSON::Object};
 
             content->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
             content->set("msg", "JWT verification failed!");
-            sendObject->set("content", content);
+            send_object->set("content", content);
         }
 
         return std::nullopt;

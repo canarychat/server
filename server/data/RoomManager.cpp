@@ -32,7 +32,6 @@ Poco::JSON::Object::Ptr RoomManager::getRoomList(int user_id) {
                 Poco::Data::Keywords::use(temp_user_id), Poco::Data::Keywords::now;
 
             std::string room_name;
-            int room_id;
             select.execute();
             Poco::Data::RecordSet rs(select);
 

@@ -6,7 +6,7 @@
 
 #include <optional>
 
-inline void random_generate_JWT_secret(){
+inline void RandomGenerateJwtSecret(){
     std::string salt;
     Poco::RandomInputStream rng;
     for (size_t i = 0; i < 24; ++i) {
@@ -15,13 +15,13 @@ inline void random_generate_JWT_secret(){
         salt += c;
     }
     std::stringstream ss;
-    Poco::Base64Encoder base64Encoder(ss);
-    base64Encoder << salt;
-    base64Encoder.close();  // 关闭编码器以刷新任何缓冲的数据
+    Poco::Base64Encoder base_64_encoder(ss);
+    base_64_encoder << salt;
+    base_64_encoder.close();  // 关闭编码器以刷新任何缓冲的数据
     g_JWT_secret = ss.str();
 }
 
-inline std::string setJWT ( const int& user_id,const std::string& username){
+inline std::string SetJwt (const int& user_id, const std::string& username){
     Poco::JWT::Signer signer{g_JWT_secret};
     Poco::JWT::Token token;
     token.setIssuer("charServerLambert");
@@ -34,7 +34,7 @@ inline std::string setJWT ( const int& user_id,const std::string& username){
     return jwt;
 }
 
- inline std::optional<std::tuple<int,string>> VerifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &responseObject) {
+ inline std::optional<std::tuple<int,string>> VerifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &response_object) {
     /// If verify successfully, verify shouldn't change the response json;
     try {
         if (auto jwt =request.get("Authorization", "");jwt.substr(0, 7) == "Bearer ") {
@@ -48,9 +48,9 @@ inline std::string setJWT ( const int& user_id,const std::string& username){
             throw Poco::Exception("No Authorization");
         }
     } catch (Poco::Exception &e) {
-        responseObject = new Poco::JSON::Object();
-        responseObject->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
-        responseObject->set("msg", "JWT验证失败");
+        response_object = new Poco::JSON::Object();
+        response_object->set("code", static_cast<int>(state_code::VERIFY_TOKEN_FAILED));
+        response_object->set("msg", "JWT验证失败");
         return std::nullopt;
     }
 }
