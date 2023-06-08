@@ -49,4 +49,4 @@ Issues and Pull Requests are accepted. Feel free to contribute to this project.
 
 ## License
 
-[MIT © Richard McRichface.](./LICENSE)
+[MIT © LambertRao.](./LICENSE)
