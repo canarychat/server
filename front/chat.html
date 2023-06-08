@@ -152,7 +152,7 @@
             } else if (messageData.type === "Authorization/jwt") {  // Please replace "AuthorizationError" with the correct type your server sends on JWT error
                 alert("登录过期，请重新登录");
                 localStorage.clear();
-                window.location.href = '/static/chatroom/login.html';  // replace '/login' with your login page url
+                window.location.href = '/chat/login.html';  // replace '/login' with your login page url
             }
         };
 

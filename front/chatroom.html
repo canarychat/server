@@ -225,16 +225,16 @@
 
         localStorage.setItem('room_id', roomid);
 
-        location.href = '/static/chatroom/chat.html';
+        location.href = '/chat/chat.html';
     }
 
     document.getElementById('createChatroom').addEventListener('click', function () {
-        window.location.href = '/static/chatroom/createRoom.html';
+        window.location.href = '/chat/createRoom.html';
     });
 
     // Add event listener for 'joinChatroom' button
     document.getElementById('joinChatroom').addEventListener('click', function () {
-        window.location.href = '/static/chatroom/joinRoom.html';
+        window.location.href = '/chat/joinRoom.html';
     });
 
     loadChatrooms();

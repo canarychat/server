@@ -76,7 +76,7 @@
                 localStorage.setItem('username', data.data.username);
                 localStorage.setItem('id', data.data.id);
                 document.getElementById('message').innerText = 'Login Successful';
-                window.location.href = '/static/chatroom/chatroom.html';
+                window.location.href = '/chat/chatroom.html';
               } else {
                 document.getElementById('message').innerText = 'Login Failed: ' + data.msg;
               }
@@ -102,7 +102,7 @@
             .then(data => {
               if (data.code === 0) {
                 document.getElementById('message').innerText = 'Verification Successful';
-                window.location.href = '/static/chatroom/chatroom.html';
+                window.location.href = '/chat/chatroom.html';
               } else {
                 document.getElementById('message').innerText = 'Verification Failed: ' + data.msg;
               }
