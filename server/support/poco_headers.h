@@ -67,6 +67,9 @@
 #include <Poco/Net/NetException.h>
 #include <Poco/Redis/AsyncReader.h>
 #include <Poco/Redis/Command.h>
+#include <Poco/Types.h>
+#include <Poco/Observer.h>
+#include <Poco/NObserver.h>
 
 
 

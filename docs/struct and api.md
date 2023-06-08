@@ -33,13 +33,14 @@ clinet not developed
 
 ```json
 {
-    "type": "text/plain",
-    "timestamp": 1618881585,
-    "sender": {
-        "id": 1008,
-        "name": "L"
-    },
-    "content": "Hello, world!"
+  "type": "text/plain",
+  "timestamp": 1618881585,
+  "sender_id": 1008,
+  "sender_name": "L",
+  "content": {
+    "room_id": 1008,
+    "message": "Hello World"
+  }
 }
 ```
 
@@ -89,8 +90,8 @@ clinet not developed
 }
 ```
 
-- 历史消息请求：
-
+## 历史消息请求：
+- client send
 ```json
 {
     "type": "HistoryRequest",
@@ -105,20 +106,38 @@ clinet not developed
     }
 }
 ```
-
+- server response
+- 
 - 系统控制消息：
-
 ```json
 {
-    "type": "SystemControl",
+  "type": "HistoryRequest",
+  "timestamp": 1618881585,
+  "sender": {
+    "id": 1008,
+    "name": "L"
+  },
+  "content": [
+    {
+      msg_json1
+    },
+    {
+      msg_json2
+    }
+  ]
+}
+```
+```json
+{
+    "type": "Sys/Err",
     "timestamp": 1618881585,
     "sender": {
-        "id": 1008,
-        "name": "L"
+        "id": 100,
+        "name": "server"
     },
     "content": {
-        "command": "kick", //命令类型，如"kick"（踢人）、"ban"（禁言）等
-        "target": 1009 //目标用户的ID
+        "command": "", 
+        "msg": "服务器错误！" 
     }
 }
 ```

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Chat Room</title>
     <style>
         body {
@@ -127,31 +128,20 @@
             'Authorization': localStorage.getItem('jwt'),
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            var userListDiv = document.getElementById('user-list');
-            data.data.members.forEach(member => {
-                if(member.username !== username){
-                    var userDiv = document.createElement('div');
-                    userDiv.classList.add('user');
-                    userDiv.textContent = member.username;
-                    userListDiv.appendChild(userDiv);
-                }
-            });
-        });
-
+    //... your code here...
     var socketUrl = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/v1/chatrooms/' + roomId + '/message';
     var socket = new WebSocket(socketUrl);
 
     socket.onopen = function () {
         // Send authorization message when connection is open
         var authMessage = {
+            type: "Authorization/jwt",
+            timestamp: Date.now(),
             sender: {
                 id: userId,
                 name: username
             },
-            type: "Authorization/jwt",
-            content: jwt
+            content:  jwt
         };
         socket.send(JSON.stringify(authMessage));
     };
@@ -161,28 +151,65 @@
         var messageData = JSON.parse(event.data);
 
         // Ignore authorization confirmation message
-        if(messageData.type === "Authorization/jwt") return;
+        if(messageData.type === "text/plain") {
 
-        var messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.textContent = messageData.sender.name + ': ' + messageData.content;
-        messageListDiv.appendChild(messageDiv);
+            var messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+
+            var senderSpan = document.createElement('span');
+            senderSpan.textContent = messageData.sender_name;
+            var color = getColor(parseInt(messageData.sender_id, 10), parseInt(userId, 10));
+            senderSpan.style.textShadow = `0 0 10px ${color}`;
+
+            var contentSpan = document.createElement('span');
+            contentSpan.textContent = messageData.content;
+
+            messageDiv.appendChild(senderSpan);
+            messageDiv.appendChild(document.createElement('br'));
+            messageDiv.appendChild(contentSpan);
+            messageListDiv.appendChild(messageDiv);
+        }
     };
 
     document.getElementById('send-button').onclick = function () {
         var messageInput = document.getElementById('message-input');
+        var message = messageInput.value;
 
-        var message = {
+        // Check for empty and too long messages
+        if (message.length === 0 || message.length > 1024) {
+            alert("你的消息太长或者太短了");
+            return;
+        }
+
+        var messageObj = {
+            type: "text/plain",
+            timestamp: Date.now(),
             sender: {
                 id: userId,
                 name: username
             },
-            type: "text/plain",
-            content: messageInput.value
+            content: {
+                room_id: roomId,
+                message: message
+            }
         };
-        socket.send(JSON.stringify(message));
+        socket.send(JSON.stringify(messageObj));
         messageInput.value = '';
     };
+
+    function getColor(id, currentUser) {
+        if (id === currentUser) {
+            return 'green';
+        } else if (id >= 1 && id <= 99) {
+            return 'red';
+        } else if (id >= 100 && id <= 999) {
+            return 'purple';
+        } else if (id >= 1000 && id <= 9999) {
+            return 'blue';
+        } else {
+            return 'yellow';
+        }
+    }
 </script>
 </body>
 </html>

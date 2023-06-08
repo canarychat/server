@@ -3,35 +3,11 @@
 //
 
 #pragma once
-#include "Route.h"
 
-#include <Poco/Util/Application.h>
-#include <Poco/Net/HTTPServer.h>
-#include <Poco/Net/HTTPRequestHandler.h>
-#include <Poco/Net/HTTPRequestHandlerFactory.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/Net/HTTPServerResponse.h>
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Util/ServerApplication.h>
+#include "poco_headers.h"
+#include "MessageManager.h"
 
-using Poco::Net::HTTPServer;
-using Poco::Net::HTTPRequestHandler;
-using Poco::Net::HTTPRequestHandlerFactory;
-using Poco::Net::HTTPServerRequest;
-using Poco::Net::HTTPServerResponse;
-using Poco::Net::ServerSocket;
-using Poco::Util::ServerApplication;
-using Poco::Util::Application;
-using Poco::Util::Subsystem;
-
-inline std::map<std::string, std::function<void(Poco::JSON::Object::Ptr)>> WS_HandlerMap = {
-//    {"text/plain", handleTextPlain},
-//    {"Authorization/jwt", handleAuthorization},
-//    {"HistoryRequest", handleHistoryRequest},
-//    {"SystemControl", handleSystemControl},
-};
-
-class ChatHttpSubSystem : public Subsystem {
+class ChatHttpSubSystem : public Poco::Util::Subsystem {
  public:
   const char *name() const override {
     return "ChatHttpSubSystem";
@@ -54,27 +30,21 @@ class ChatHTTPRequestHandler : public Poco::Net::HTTPRequestHandler {
  public:
   void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override ;
 };
-
-class ChatWSRequestHandler : public Poco::Net::HTTPRequestHandler {
- public:
-  void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override ;
-};
-
 class ChatHTTPRequestHandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
- public:
-  ChatHTTPRequestHandlerFactory() = default;
-  Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
+  public:
+    ChatHTTPRequestHandlerFactory() = default;
+    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override {
 
-      if(request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0)
-          return new ChatWSRequestHandler;
-      else
-          return new ChatHTTPRequestHandler;
-  }
+        if(request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0)
+            return new ChatWSRequestHandler;
+        else
+            return new ChatHTTPRequestHandler;
+    }
 };
 
- class RequestNotification: public Poco::Notification{
-  public:
-    RequestNotification(HTTPServerRequest& request, HTTPServerResponse& response):request_(request),response_(response){}
-    HTTPServerRequest& request_;
-    HTTPServerResponse& response_;
- };
+// class RequestNotification: public Poco::Notification{
+//  public:
+//    RequestNotification(HTTPServerRequest& request, HTTPServerResponse& response):request_(request),response_(response){}
+//    HTTPServerRequest& request_;
+//    HTTPServerResponse& response_;
+// };
