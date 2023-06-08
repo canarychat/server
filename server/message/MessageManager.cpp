@@ -39,8 +39,9 @@ void MessageManager::sendMsg(Poco::JSON::Object::Ptr recv_json, Poco::JSON::Obje
             msg->stringify(oss);
             Poco::Redis::Command clp = Poco::Redis::Command::lpush(key, oss.str());
             redis.execute<Poco::Int64>(clp);
-            //TODO: 异步插入到数据库
-
+            //插入数据库
+            DataFacade::insertMsg(room_id, recv_json->getObject("sender")->get("id"),oss.str());
+            //TODO:应该做成异步的
         } else {
             throw Poco::Exception("No message content found");
         }

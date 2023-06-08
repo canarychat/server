@@ -31,5 +31,7 @@ class UserManager: public Poco::Util::Subsystem{
 
     Poco::JSON::Object::Ptr loginUser(const std::string& username, const int &user_id, const std::string& password);
 
+    bool insertMsg(int user_id, int room_id, std::string message);
+
   private:
 };

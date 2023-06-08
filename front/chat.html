@@ -23,21 +23,13 @@
             margin-right: 10px;
             background-color: white;
         }
-        #current-user {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: lightgray;
-        }
-        #current-user .status {
-            width: 10px;
+        .status-dot {
             height: 10px;
+            width: 10px;
+            background-color: #bbb;
             border-radius: 50%;
-            background-color: #007BA7;
-            margin-right: 10px;
+            display: inline-block;
+            margin-left: 10px;
         }
         #message-area {
             flex: 4;
@@ -99,10 +91,6 @@
 <body>
 <div id="user-list">
     <!-- User list will be dynamically added here -->
-    <div id="current-user">
-        <div class="status"></div>
-        <span id="current-username"><!-- Username will be added here --></span>
-    </div>
 </div>
 <div id="message-area">
     <div id="message-list">
@@ -119,66 +107,80 @@
     var username = localStorage.getItem('username');
     var userId = localStorage.getItem('id');
     var jwt = localStorage.getItem('jwt');
+    var socket;
 
-    document.getElementById('current-username').textContent = username;
 
-    // Fetch room member list and append to user list
-    fetch('/api/v1/chatrooms/' + roomId + '/member',{
-        headers:{
-            'Authorization': localStorage.getItem('jwt'),
-        }
-    })
-    //... your code here...
-    var socketUrl = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/v1/chatrooms/' + roomId + '/message';
-    var socket = new WebSocket(socketUrl);
+    function startWebSocket() {
+        var socketUrl = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/api/v1/chatrooms/' + roomId + '/message';
+        socket = new WebSocket(socketUrl);
 
-    socket.onopen = function () {
-        // Send authorization message when connection is open
-        var authMessage = {
-            type: "Authorization/jwt",
-            timestamp: Date.now(),
-            sender: {
-                id: userId,
-                name: username
-            },
-            content:  jwt
+        socket.onopen = function () {
+            var authMessage = {
+                type: "Authorization/jwt",
+                timestamp: Date.now(),
+                sender: {
+                    id: userId,
+                    name: username
+                },
+                content:  jwt
+            };
+            socket.send(JSON.stringify(authMessage));
+            fetchMembers();
         };
-        socket.send(JSON.stringify(authMessage));
-    };
 
-    socket.onmessage = function (event) {
-        var messageListDiv = document.getElementById('message-list');
-        var messageData = JSON.parse(event.data);
+        socket.onmessage = function (event) {
+            var messageListDiv = document.getElementById('message-list');
+            var messageData = JSON.parse(event.data);
 
-        // Ignore authorization confirmation message
-        if(messageData.type === "text/plain") {
+            if(messageData.type === "text/plain") {
+                var messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
 
-            var messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
+                var senderSpan = document.createElement('span');
+                senderSpan.textContent = messageData.sender_name;
+                var color = getColor(parseInt(messageData.sender_id, 10), parseInt(userId, 10));
+                senderSpan.style.textShadow = `0 0 10px ${color}`;
 
-            var senderSpan = document.createElement('span');
-            senderSpan.textContent = messageData.sender_name;
-            var color = getColor(parseInt(messageData.sender_id, 10), parseInt(userId, 10));
-            senderSpan.style.textShadow = `0 0 10px ${color}`;
+                var contentSpan = document.createElement('span');
+                contentSpan.textContent = messageData.content;
 
-            var contentSpan = document.createElement('span');
-            contentSpan.textContent = messageData.content;
+                messageDiv.appendChild(senderSpan);
+                messageDiv.appendChild(document.createElement('br'));
+                messageDiv.appendChild(contentSpan);
+                messageListDiv.appendChild(messageDiv);
+            } else if (messageData.type === "Authorization/jwt") {  // Please replace "AuthorizationError" with the correct type your server sends on JWT error
+                alert("登录过期，请重新登录");
+                localStorage.clear();
+                window.location.href = '/static/chatroom/login.html';  // replace '/login' with your login page url
+            }
+        };
 
-            messageDiv.appendChild(senderSpan);
-            messageDiv.appendChild(document.createElement('br'));
-            messageDiv.appendChild(contentSpan);
-            messageListDiv.appendChild(messageDiv);
-        }
-    };
+        socket.onerror = function (event) {
+            console.log("WebSocket error observed:", event);
+        };
+
+        socket.onclose = function(event) {
+            if (event.wasClean) {
+                console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+            } else {
+                console.log('[close] Connection died');
+            }
+        };
+    }
+
+    startWebSocket();
 
     document.getElementById('send-button').onclick = function () {
         var messageInput = document.getElementById('message-input');
         var message = messageInput.value;
 
-        // Check for empty and too long messages
         if (message.length === 0 || message.length > 1024) {
             alert("你的消息太长或者太短了");
             return;
+        }
+
+        if (!socket || socket.readyState != WebSocket.OPEN) {
+            startWebSocket(); // Reconnect to WebSocket if it's not open
         }
 
         var messageObj = {
@@ -210,6 +212,44 @@
             return 'yellow';
         }
     }
+
+    function fetchMembers() {
+        fetch('/api/v1/chatrooms/' + roomId + '/member',{
+            headers:{
+                'Authorization': localStorage.getItem('jwt'),
+            }
+        }).then(response => response.json())
+            .then(data => {
+                if (data.code === 0 && data.data && data.data.members) {
+                    const userListDiv = document.getElementById('user-list');
+                    data.data.members.forEach(member => {
+                        const userDiv = document.createElement('div');
+                        userDiv.classList.add('user');
+
+                        const userSpan = document.createElement('span');
+                        userSpan.textContent = member.username;
+                        userSpan.style.marginLeft = '15px';  // 添加间距
+
+                        const statusDotDiv = document.createElement('div');
+                        statusDotDiv.classList.add('status-dot');
+                        statusDotDiv.style.backgroundColor = getColor(member.id);  // 为每个用户分配颜色
+
+                        userDiv.appendChild(statusDotDiv);
+                        userDiv.appendChild(userSpan);
+                        userListDiv.appendChild(userDiv);
+                    });
+                } else {
+                    console.error("Failed to fetch room members: ", data.msg);
+                    // Redirect to login page if fetching members failed
+                    window.location.href = 'login.html';
+                }
+            }).catch(err => {
+            console.error("Error fetching room members: ", err);
+            // Redirect to login page if an error occurred
+            window.location.href = 'login.html';
+        });
+    }
+
 </script>
 </body>
 </html>
