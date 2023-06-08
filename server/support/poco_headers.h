@@ -65,6 +65,8 @@
 #include <Poco/URI.h>
 #include <Poco/Net/WebSocket.h>
 #include <Poco/Net/NetException.h>
+#include <Poco/Redis/AsyncReader.h>
+#include <Poco/Redis/Command.h>
 
 
 
@@ -93,3 +95,5 @@ using Poco::ActiveRecord::Query;
 using std::string;
 
 #include <optional>
+
+inline string g_JWT_secret;

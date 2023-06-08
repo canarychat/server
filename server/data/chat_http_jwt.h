@@ -6,8 +6,6 @@
 
 #include <optional>
 
-inline string g_JWT_secret;
-
 inline void random_generate_JWT_secret(){
     std::string salt;
     Poco::RandomInputStream rng;
@@ -36,7 +34,8 @@ inline std::string setJWT ( const int& user_id,const std::string& username){
     return jwt;
 }
 
- inline std::optional<std::tuple<int,string>> verifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &responseObject) {
+ inline std::optional<std::tuple<int,string>> VerifyJwt(Poco::Net::HTTPServerRequest &request, Poco::JSON::Object::Ptr &responseObject) {
+    /// If verify successfully, verify shouldn't change the response json;
     try {
         if (auto jwt =request.get("Authorization", "");jwt.substr(0, 7) == "Bearer ") {
             jwt = jwt.substr(7);

@@ -3,6 +3,7 @@
 //
 
 #include "ChatHttp.h"
+#include "chat_ws_jwt.h"
 #include <regex>
 
 void ChatHttpSubSystem::initialize(Application &app) {// 子系统的初始化逻辑
@@ -64,12 +65,10 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
 }
 void ChatWSRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response) {
     Application &app = Application::instance();
-    auto request_method = request.getMethod();
     auto request_uri = request.getURI();
     auto request_host = request.getHost();
-    poco_information_f3(app.logger(),
-                        "request method: %s, uri: %s, host: %s",
-                        request_method,
+    poco_information_f2(app.logger(),
+                        "request method: WS, uri: %s, host: %s",
                         request_uri,
                         request_host);
 
@@ -77,14 +76,30 @@ void ChatWSRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServerR
 
     try {
         Poco::Net::WebSocket ws(request, response);
-        char buffer[1024];
-        int flags;
-        while (true) {
-            int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
-            ws.sendFrame(buffer, n, flags);
-            if ((flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_CLOSE)
-                break;
+        char buffer[8192];
+        int flags, recv;
+
+        //Auth
+        Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
+        recv = ws.receiveFrame(buffer, sizeof(buffer), flags);
+
+        Poco::JSON::Parser parser;
+        auto recv_json = parser.parse(buffer).extract<Poco::JSON::Object::Ptr>();
+        auto v = VerifyJwt(recv_json,result);
+        if (!v.has_value()) {
+            poco_information_f1(app.logger(), "auth failed: %s", result->get("msg").toString());
+            std::ostringstream ostr;
+            result->stringify(ostr);
+            ws.sendFrame(ostr.str().c_str(), ostr.str().length(), flags);
+            return;
         }
+
+        do {
+            recv = ws.receiveFrame(buffer, sizeof(buffer), flags);
+
+            ws.sendFrame(buffer, recv, flags);
+        }
+        while (recv > 0 && (flags & WebSocket::FRAME_OP_BITMASK) != WebSocket::FRAME_OP_CLOSE);
     } catch (Poco::Net::WebSocketException &exc) {
         // Handle WebSocket exception
         poco_information(Application::instance().logger(), exc.displayText());
