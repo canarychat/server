@@ -16,7 +16,7 @@ void ChatHttpSubSystem::initialize(Application &app) {// 子系统的初始化�
 
     //set params
     auto thread_number = app.config().getInt("MainServer.threadNumber", 16);
-    p_params_->setMaxThreads(16);
+    p_params_->setMaxThreads(thread_number);
     p_params_->setMaxQueued(64);
     p_params_->setThreadIdleTime(100);
 

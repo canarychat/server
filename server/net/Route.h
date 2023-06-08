@@ -112,7 +112,7 @@ inline std::vector<Route> routeTable{
              if (id == 0)
                  id = DataFacade::get_id_from_name(username);
              if (json->getValue<int>("code") == 0) {
-                 response.set("Authorization", "Bearer " + setJWT(id, username));
+                 response.set("Authorization", "Bearer " + SetJwt(id, username));
                  Poco::JSON::Object::Ptr data = new Poco::JSON::Object();
                  data->set("username", username);
                  data->set("id", id);

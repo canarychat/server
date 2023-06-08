@@ -26,7 +26,7 @@ class MainServer : public Poco::Util::ServerApplication {
             poco_information(logger(), "JWT_SECRET found in environment");
             g_JWT_secret = Poco::Environment::get("JWT_SECRET");
         } else {
-            random_generate_JWT_secret();
+            RandomGenerateJwtSecret();
             poco_information(logger(), "JWT_SECRET random generated");
         }
 
@@ -98,8 +98,6 @@ class MainServer : public Poco::Util::ServerApplication {
         if (_helpRequested) {
             displayHelp();
         } else {
-            unsigned short port = (unsigned short) config().getInt("MainServer.port", 12300);
-            std::string format(config().getString("MainServer.format", DateTimeFormat::SORTABLE_FORMAT));
             ThreadPool::defaultPool().addCapacity(config().getInt("MainServer.threadPoolCapacity", 16));
             waitForTerminationRequest();
         }
