@@ -6,6 +6,8 @@
 #include "ChatRoomDB/User.h"
 #include "state_code.h"
 #include "DataFacade.h"
+#include "ChatRoomDB/Room.h"
+#include "ChatRoomDB/Message.h"
 
 void UserManager::initialize(Poco::Util::Application &app) {
     app.logger().information("UserManager Init");
@@ -141,4 +143,29 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         return respond_json;
     }
 
+}
+bool UserManager::insertMsg(int user_id, int room_id, std::string message) {
+    try {
+        auto session = DataFacade::getSession();
+        Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
+        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        if (p_user == nullptr) {
+            return false;
+        }
+        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        if (p_room == nullptr) {
+            return false;
+        }
+        auto p_message = new ChatRoomDB::Message;
+        p_message->sender_id(p_user);
+        p_message->room_id(p_room);
+        p_message->content(message);
+        p_message->timestamp(Poco::Timestamp().epochTime());
+        p_message->create(p_context);
+        return true;
+    }
+    catch (Poco::Exception &e) {
+        poco_error(Application::instance().logger(), e.displayText());
+        return false;
+    }
 }

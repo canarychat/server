@@ -68,4 +68,9 @@ struct DataFacade {
         return Application::instance().getSubsystem<RoomManager>().leaveRoom(room_id,user_id);
     }
 
+    static bool insertMsg(int room_id,int user_id,string msg){
+        //借用一下UserManager,现在没必要为了它再开一个子系统
+        return Application::instance().getSubsystem<UserManager>().insertMsg(user_id,room_id,std::move(msg));
+    }
+
 };// namespace DataFacade
