@@ -7,15 +7,8 @@ chatroom:1008:message [
 ]
 ```
 
-```redsi 
-chatroom:1008:users [
-    '{"user_id": 1, "timestamp": 1642422240}',
-    '{"user_id": 2, "timestamp": 1642422250}'
-]
-```
+
 ```redis
-online:users [
-    '{"user_id": 1, "timestamp": 1642422240}',
-    '{"user_id": 2, "timestamp": 1642422250}'
-]~~~~
+SET user:<user_id>:online true EX 60
+EXISTS user:<user_id>:online
 ```

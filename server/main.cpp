@@ -6,6 +6,7 @@
 #include "ChatHttp.h"
 
 #include "support/poco_headers.h"
+#include "MessageManager.h"
 
 class MainServer : public Poco::Util::ServerApplication {
   public:
@@ -32,6 +33,7 @@ class MainServer : public Poco::Util::ServerApplication {
         try {
             addSubsystem(new DataManager(connectionString));
             addSubsystem(new ChatHttpSubSystem);
+            addSubsystem(new MessageManager);
         }
         catch (Poco::Exception &e) {
             poco_error(logger(), e.displayText());

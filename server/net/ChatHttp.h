@@ -24,6 +24,13 @@ using Poco::Util::ServerApplication;
 using Poco::Util::Application;
 using Poco::Util::Subsystem;
 
+inline std::map<std::string, std::function<void(Poco::JSON::Object::Ptr)>> WS_HandlerMap = {
+//    {"text/plain", handleTextPlain},
+//    {"Authorization/jwt", handleAuthorization},
+//    {"HistoryRequest", handleHistoryRequest},
+//    {"SystemControl", handleSystemControl},
+};
+
 class ChatHttpSubSystem : public Subsystem {
  public:
   const char *name() const override {

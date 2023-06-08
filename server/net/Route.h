@@ -10,7 +10,7 @@
 
 #include "poco_headers.h"
 #include "DataManager.h"
-#include "chat_jwt.h"
+#include "chat_http_jwt.h"
 #include "state_code.h"
 #include "DataFacade.h"
 
@@ -125,7 +125,7 @@ inline std::vector<Route> routeTable{
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
 
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
-         auto v = verifyJwt(request, result);
+         auto v = VerifyJwt(request, result);
          if (v.has_value()) {
              auto [id, string] = v.value();
              result = DataFacade::getRoomList(id);
@@ -137,7 +137,7 @@ inline std::vector<Route> routeTable{
     {{"POST", std::regex("^/chatroom$")},
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
-         auto v = verifyJwt(request, result);
+         auto v = VerifyJwt(request, result);
          if (v.has_value()) {
              auto [id, string] = v.value();
              Poco::JSON::Parser parser;
@@ -165,7 +165,7 @@ inline std::vector<Route> routeTable{
          int room_id = std::stoi(paths[1]);
 
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
-         auto v = verifyJwt(request, result);
+         auto v = VerifyJwt(request, result);
          if (v.has_value()) {
              auto [id, string] = v.value();
              result = DataFacade::getRoomMemberList(room_id, id);
@@ -184,7 +184,7 @@ inline std::vector<Route> routeTable{
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
 
-         auto v = verifyJwt(request, result);
+         auto v = VerifyJwt(request, result);
          if (v.has_value()) {
              auto [user_id, string] = v.value();
 
@@ -202,7 +202,7 @@ inline std::vector<Route> routeTable{
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
 
-         auto v = verifyJwt(request, result);
+         auto v = VerifyJwt(request, result);
          if (v.has_value()) {
              auto [id, string] = v.value();
 
@@ -230,7 +230,7 @@ inline std::vector<Route> routeTable{
      [](HTTPServerRequest &request, HTTPServerResponse &response) {
          Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
 
-         auto v = verifyJwt(request, result);
+         auto v = VerifyJwt(request, result);
          if (v.has_value()) {
              auto [id, string] = v.value();
 
