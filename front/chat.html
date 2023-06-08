@@ -125,7 +125,8 @@
                 content:  jwt
             };
             socket.send(JSON.stringify(authMessage));
-            fetchMembers();
+            fetchMembers(); // 在这里刷新用户列表
+            document.getElementById('send-button').textContent = "Send";
         };
 
         socket.onmessage = function (event) {
@@ -165,6 +166,7 @@
             } else {
                 console.log('[close] Connection died');
             }
+            document.getElementById('send-button').textContent = "Reconnect";
         };
     }
 
@@ -173,6 +175,11 @@
     document.getElementById('send-button').onclick = function () {
         var messageInput = document.getElementById('message-input');
         var message = messageInput.value;
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            startWebSocket(); // Reconnect to WebSocket if it's not open
+            return; // 在这里返回，不发送消息
+        }
 
         if (message.length === 0 || message.length > 1024) {
             alert("你的消息太长或者太短了");
@@ -214,6 +221,11 @@
     }
 
     function fetchMembers() {
+        var userListDiv = document.getElementById('user-list');
+        while(userListDiv.firstChild) {
+            userListDiv.removeChild(userListDiv.firstChild);
+        }
+
         fetch('/api/v1/chatrooms/' + roomId + '/member',{
             headers:{
                 'Authorization': localStorage.getItem('jwt'),

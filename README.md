@@ -28,9 +28,7 @@ The motivation behind this project was to learn and gain hands-on experience wit
 
 Firstly, you need to install POCO:
 
-```bash
-sudo apt-get install poco
-```
+you can get some help [here](https://cppsecrets.com/users/36681111069711511910546971161041031049711497575664103109971051084699111109/Ubuntu-install-poco-C00-library-Linux.php)
 Then you can build the project:
 
 ```bash
