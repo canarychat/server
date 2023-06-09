@@ -94,9 +94,14 @@ using Poco::Util::OptionSet;
 using Poco::Util::HelpFormatter;
 using Poco::ActiveRecord::Context;
 using Poco::ActiveRecord::Query;
+using HTTPStatus = Poco::Net::HTTPResponse::HTTPStatus;
 
 using std::string;
 
 #include <optional>
 
 inline string g_JWT_secret;
+
+template<typename T>
+using HttpParam = std::tuple<HTTPStatus , T>;
+using HttpParamJSON = HttpParam<Poco::JSON::Object::Ptr>;

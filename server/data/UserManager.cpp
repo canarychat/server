@@ -13,7 +13,7 @@ void UserManager::initialize(Poco::Util::Application &app) {
     app.logger().information("UserManager Init");
 }
 
-Poco::JSON::Object::Ptr UserManager::registerUser
+HttpParamJSON UserManager::registerUser
     (const std::string &username, const std::string &password, const std::string &email) {
     //Active Record
     ChatRoomDB::User::Ptr p_user = new ChatRoomDB::User;
@@ -49,7 +49,7 @@ Poco::JSON::Object::Ptr UserManager::registerUser
             poco_information(Application::instance().logger(), "Username already exists");
             respond_json->set("code", static_cast<int>(state_code::REGISTRATION_NICKNAME_EXISTS));
             respond_json->set("msg", "用户名已存在");
-            return respond_json;
+            return HttpParamJSON (HTTPStatus::HTTP_CONFLICT,respond_json);
         }
 
         if (!email.empty()) {
@@ -59,7 +59,7 @@ Poco::JSON::Object::Ptr UserManager::registerUser
                 poco_information(Application::instance().logger(), "Email already exists");
                 respond_json->set("code", static_cast<int>(state_code::REGISTRATION_EMAIL_EXISTS));
                 respond_json->set("msg", "邮箱已存在");
-                return respond_json;
+                return HttpParamJSON (HTTPStatus::HTTP_CONFLICT,respond_json);
             }
             p_user->email(email);
         } else {
@@ -74,7 +74,7 @@ Poco::JSON::Object::Ptr UserManager::registerUser
         poco_error(Application::instance().logger(), e.displayText());
         respond_json->set("code", static_cast<int>(state_code::REGISTRATION_SERVER_ERROR));
         respond_json->set("msg", "服务器错误");
-        return respond_json;
+        return HttpParamJSON (HTTPStatus::HTTP_INTERNAL_SERVER_ERROR,respond_json);
     }
 
     Poco::JSON::Object::Ptr data_json = new Poco::JSON::Object;
@@ -86,10 +86,10 @@ Poco::JSON::Object::Ptr UserManager::registerUser
     respond_json->set("code", static_cast<int>(state_code::SUCCESS));
     respond_json->set("msg", "注册成功");
 
-    return respond_json;
+    return HttpParamJSON (HTTPStatus::HTTP_OK,respond_json);
 }
 
-Poco::JSON::Object::Ptr UserManager::loginUser
+HttpParamJSON UserManager::loginUser
     (const std::string &username_, const int &user_id_, const std::string &password) {
     Poco::JSON::Object::Ptr respond_json = new Poco::JSON::Object;
     string stored_salt;
@@ -100,7 +100,7 @@ Poco::JSON::Object::Ptr UserManager::loginUser
     if (username.empty() && user_id == 0) {
         respond_json->set("code", static_cast<int>(state_code::LOGIN_CLIENT_ERROR));
         respond_json->set("msg", "客户端错误");
-        return respond_json;
+        return HttpParamJSON (HTTPStatus::HTTP_BAD_REQUEST,respond_json);
     } else if (username.empty()) {
         //login with ID
         auto session = DataFacade::getSession();
@@ -109,7 +109,7 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         if (user == nullptr) {
             respond_json->set("code", static_cast<int>(state_code::LOGIN_ID_NOT_EXIST));
             respond_json->set("msg", "ID不存在");
-            return respond_json;
+            return HttpParamJSON (HTTPStatus::HTTP_NOT_FOUND,respond_json);
         }
         stored_salt = user->salt();
         stored_password = user->password();
@@ -123,7 +123,7 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         if (user.empty()) {
             respond_json->set("code", static_cast<int>(state_code::LOGIN_USERNAME_NOT_EXIST));
             respond_json->set("msg", "用户名不存在");
-            return respond_json;
+            return HttpParamJSON (HTTPStatus::HTTP_NOT_FOUND,respond_json);
         }
         stored_salt = user[0]->salt();
         stored_password = user[0]->password();
@@ -140,12 +140,12 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         respond_json->set("code", static_cast<int>(state_code::SUCCESS));
         respond_json->set("msg", "登录成功");
 
-        //token
-        return respond_json;
+        ///We need to generate a token for the user
+        return HttpParamJSON (HTTPStatus::HTTP_OK,respond_json);
     } else {
         respond_json->set("code", static_cast<int>(state_code::LOGIN_PASSWORD_ERROR));
         respond_json->set("msg", "密码错误");
-        return respond_json;
+        return HttpParamJSON (HTTPStatus::HTTP_UNAUTHORIZED,respond_json);
     }
 
 }
