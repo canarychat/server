@@ -5,6 +5,7 @@
 #pragma once
 
 #include <optional>
+#include "DataFacade.h"
 
 inline void RandomGenerateJwtSecret(){
     std::string salt;
@@ -21,7 +22,11 @@ inline void RandomGenerateJwtSecret(){
     g_JWT_secret = ss.str();
 }
 
-inline std::string SetJwt (const int& user_id, const std::string& username){
+inline std::string SetJwt (const int& user_id_, const std::string& username){
+    int user_id;
+    if(user_id_ == 0){
+        user_id = DataFacade::get_id_from_name(username);
+    }
     Poco::JWT::Signer signer{g_JWT_secret};
     Poco::JWT::Token token;
     token.setIssuer("charServerLambert");

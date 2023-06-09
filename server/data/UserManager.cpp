@@ -90,11 +90,12 @@ Poco::JSON::Object::Ptr UserManager::registerUser
 }
 
 Poco::JSON::Object::Ptr UserManager::loginUser
-    (const std::string &username_, const int &user_id, const std::string &password) {
+    (const std::string &username_, const int &user_id_, const std::string &password) {
     Poco::JSON::Object::Ptr respond_json = new Poco::JSON::Object;
     string stored_salt;
     string stored_password;
     string username(username_);
+    int user_id = user_id_;
 
     if (username.empty() && user_id == 0) {
         respond_json->set("code", static_cast<int>(state_code::LOGIN_CLIENT_ERROR));
@@ -126,6 +127,7 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         }
         stored_salt = user[0]->salt();
         stored_password = user[0]->password();
+        user_id = user[0]->id();
     }
     Poco::Crypto::DigestEngine engine("SHA256");
     engine.update(password + stored_salt);
