@@ -16,7 +16,7 @@ void UserManager::initialize(Poco::Util::Application &app) {
 Poco::JSON::Object::Ptr UserManager::registerUser
     (const std::string &username, const std::string &password, const std::string &email) {
     //Active Record
-    auto p_user = new ChatRoomDB::User;
+    ChatRoomDB::User::Ptr p_user = new ChatRoomDB::User;
     //Respond JSON
     Poco::JSON::Object::Ptr respond_json = new Poco::JSON::Object;
 
@@ -90,10 +90,11 @@ Poco::JSON::Object::Ptr UserManager::registerUser
 }
 
 Poco::JSON::Object::Ptr UserManager::loginUser
-    (const std::string &username, const int &user_id, const std::string &password) {
+    (const std::string &username_, const int &user_id, const std::string &password) {
     Poco::JSON::Object::Ptr respond_json = new Poco::JSON::Object;
     string stored_salt;
     string stored_password;
+    string username(username_);
 
     if (username.empty() && user_id == 0) {
         respond_json->set("code", static_cast<int>(state_code::LOGIN_CLIENT_ERROR));
@@ -103,7 +104,7 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         //login with ID
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
-        auto user = ChatRoomDB::User::find(p_context, user_id);
+        ChatRoomDB::User::Ptr user = ChatRoomDB::User::find(p_context, user_id);
         if (user == nullptr) {
             respond_json->set("code", static_cast<int>(state_code::LOGIN_ID_NOT_EXIST));
             respond_json->set("msg", "ID不存在");
@@ -111,6 +112,7 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         }
         stored_salt = user->salt();
         stored_password = user->password();
+        username = user->username();
     } else if (user_id == 0) {
         //login with username
         auto session = DataFacade::getSession();
@@ -124,13 +126,14 @@ Poco::JSON::Object::Ptr UserManager::loginUser
         }
         stored_salt = user[0]->salt();
         stored_password = user[0]->password();
-
     }
     Poco::Crypto::DigestEngine engine("SHA256");
     engine.update(password + stored_salt);
     string provided_hashed_password = Poco::DigestEngine::digestToHex(engine.digest());
     if (provided_hashed_password == stored_password) {
         Poco::JSON::Object::Ptr data_json = new Poco::JSON::Object;
+        data_json->set("id", user_id);
+        data_json->set("username", username);
         respond_json->set("data", data_json);
         respond_json->set("code", static_cast<int>(state_code::SUCCESS));
         respond_json->set("msg", "登录成功");
@@ -148,15 +151,15 @@ bool UserManager::insertMsg(int user_id, int room_id, std::string message) {
     try {
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
-        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        ChatRoomDB::User::Ptr p_user = ChatRoomDB::User::find(p_context, user_id);
         if (p_user == nullptr) {
             return false;
         }
-        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        ChatRoomDB::Room::Ptr p_room = ChatRoomDB::Room::find(p_context, room_id);
         if (p_room == nullptr) {
             return false;
         }
-        auto p_message = new ChatRoomDB::Message;
+        ChatRoomDB::Message::Ptr p_message = new ChatRoomDB::Message;
         p_message->sender_id(p_user);
         p_message->room_id(p_room);
         p_message->content(message);

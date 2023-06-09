@@ -19,7 +19,7 @@ Poco::JSON::Object::Ptr RoomManager::getRoomList(int user_id) {
     try {
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
-        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        ChatRoomDB::User::Ptr p_user = ChatRoomDB::User::find(p_context, user_id);
         if (p_user) {
             int temp_user_id = user_id;
             Poco::Data::Statement select(session);
@@ -69,7 +69,7 @@ Poco::JSON::Object::Ptr RoomManager::createRoom(int owner_id, std::string room_n
     try {
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
-        auto p_user = ChatRoomDB::User::find(p_context, owner_id);
+        ChatRoomDB::User::Ptr p_user = ChatRoomDB::User::find(p_context, owner_id);
         if (p_user) {
             ChatRoomDB::Room::Ptr room = new ChatRoomDB::Room;
             room->
@@ -179,14 +179,14 @@ Poco::JSON::Object::Ptr RoomManager::joinRoom(int room_id, int user_id) {
         auto session = DataFacade::getSession();
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
 
-        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        ChatRoomDB::Room::Ptr p_room = ChatRoomDB::Room::find(p_context, room_id);
         if (!p_room) {
             result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
             result->set("msg", "房间不存在");
             return result;
         }
 
-        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        ChatRoomDB::User::Ptr p_user = ChatRoomDB::User::find(p_context, user_id);
         if (!p_user) {
             result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
             result->set("msg", "用户不存在");
@@ -300,7 +300,7 @@ bool RoomManager::check_exit(Poco::JSON::Object::Ptr result,
                              int room_id = 0,
                              int user_id = 0) {
     if (room_id != 0) {
-        auto p_room = ChatRoomDB::Room::find(p_context, room_id);
+        ChatRoomDB::Room::Ptr p_room = ChatRoomDB::Room::find(p_context, room_id);
         if (!p_room) {
             result->set("code", static_cast<int>(state_code::CHATROOM_NOT_EXIST));
             result->set("msg", "房间不存在");
@@ -309,7 +309,7 @@ bool RoomManager::check_exit(Poco::JSON::Object::Ptr result,
     }
 
     if (user_id != 0) {
-        auto p_user = ChatRoomDB::User::find(p_context, user_id);
+        ChatRoomDB::User::Ptr p_user = ChatRoomDB::User::find(p_context, user_id);
         if (!p_user) {
             result->set("code", static_cast<int>(state_code::CHATROOM_USER_NOT_EXIST));
             result->set("msg", "用户不存在");
