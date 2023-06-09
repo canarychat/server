@@ -107,7 +107,6 @@ inline std::vector<Route> routeTable{
              auto username = res->getValue<string>("username");
              auto password = res->getValue<string>("password");
              auto id = res->getValue<int>("id");
-
              Poco::JSON::Object::Ptr json = DataFacade::loginUser(username, id, password);
              if (json->getValue<int>("code") == 0) {
                  ///login successfully
