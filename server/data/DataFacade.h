@@ -12,13 +12,13 @@
 
 struct DataFacade {
 /// \brief 一个数据操作接口
-    static Poco::JSON::Object::Ptr registerUser(const std::string &username,
+    static HttpParamJSON registerUser(const std::string &username,
                                                 const std::string &password,
                                                 const std::string &email = "") {
         return Application::instance().getSubsystem<UserManager>().registerUser(username, password, email);
     }
 
-    static Poco::JSON::Object::Ptr loginUser(const std::string &username,
+    static HttpParamJSON loginUser(const std::string &username,
                                              const int &user_id,
                                              const std::string &password) {
         return Application::instance().getSubsystem<UserManager>().loginUser(username, user_id, password);
