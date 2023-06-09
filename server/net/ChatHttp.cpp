@@ -36,6 +36,11 @@ void ChatHttpSubSystem::uninitialize() {
 }
 void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response) {
     Application &app = Application::instance();
+    response.setContentType("application/json");
+    response.setChunkedTransferEncoding(true);
+    response.setKeepAlive(true);
+    response.set("Server", "Lambert's ChatServer/api/v1");
+
     auto request_method = request.getMethod();
     auto request_uri = request.getURI();
     auto request_host = request.getHost();
@@ -44,8 +49,6 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
                         request_method,
                         request_uri,
                         request_host);
-
-    response.set("server", "Lambert's ChatServer/api/v1");
 
     for (const auto &route : routeTable) {
         std::regex route_regex(route.first.pattern);
@@ -61,7 +64,8 @@ void ChatHTTPRequestHandler::handleRequest(HTTPServerRequest &request, HTTPServe
     json->set("msg", "api not found");
     json->stringify(ostr);
     poco_warning_f1(app.logger(), "api not found: %s", request_uri);
-    response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
-
+    response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+    sleep(1);
+    ostr << "api not found";//TODO this is a test
 }
 
