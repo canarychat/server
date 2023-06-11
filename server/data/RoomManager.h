@@ -23,21 +23,21 @@ class RoomManager : public Poco::Util::Subsystem {
     }
 
     //功能函数
-    Poco::JSON::Object::Ptr getRoomList(int user_id);
+    HttpParamJSON getRoomList(int user_id);
 
-    Poco::JSON::Object::Ptr createRoom(int owner_id, std::string room_name, std::string description="");
+    HttpParamJSON createRoom(int owner_id, std::string room_name, std::string description="");
 
-    Poco::JSON::Object::Ptr deleteRoom(int room_id,int user_id);
+    HttpParamJSON deleteRoom(int room_id,int user_id);
 
-    Poco::JSON::Object::Ptr getRoomInfo(int room_id);
+    HttpParamJSON getRoomInfo(int room_id);
 
-    Poco::JSON::Object::Ptr getRoomMemberList(int room_id,int user_id);
+    HttpParamJSON getRoomMemberList(int room_id,int user_id);
 
-    Poco::JSON::Object::Ptr joinRoom(int room_id,int user_id);
+    HttpParamJSON joinRoom(int room_id,int user_id);
 
-    Poco::JSON::Object::Ptr leaveRoom(int room_id,int user_id);
+    HttpParamJSON leaveRoom(int room_id,int user_id);
 
   private:
 
-    bool check_exit(Poco::JSON::Object::Ptr result,Poco::ActiveRecord::Context::Ptr, int room_id, int user_id);
+    HttpParam<> check_exit(Poco::JSON::Object::Ptr result,Poco::ActiveRecord::Context::Ptr, int room_id, int user_id);
 };
