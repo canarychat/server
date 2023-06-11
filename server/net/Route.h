@@ -114,7 +114,8 @@ inline std::vector<Route> routeTable{
             auto v = VerifyJwt(request, result);
             if (v.has_value()) {
                 auto [id, string] = v.value();
-                result = DataFacade::getRoomList(id);
+                auto [status, result] = DataFacade::getRoomList(id);
+                response.setStatus(status);
                 result->stringify(response.send());
             } else {
                 result->stringify(response.send());
@@ -134,7 +135,8 @@ inline std::vector<Route> routeTable{
                 auto res = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
                 auto room_name = res->getValue<std::string>("name");
                 auto room_description = res->getValue<std::string>("description");
-                result = DataFacade::createRoom(id, room_name, room_description);
+                auto [status, result] = DataFacade::createRoom(id, room_name, room_description);
+                response.setStatus(status);
                 result->stringify(response.send());
             } else {
                 result->stringify(response.send());
@@ -164,7 +166,8 @@ inline std::vector<Route> routeTable{
             auto v = VerifyJwt(request, result);
             if (v.has_value()) {
                 auto [id, string] = v.value();
-                result = DataFacade::getRoomMemberList(room_id, id);
+                auto[status, result] = DataFacade::getRoomMemberList(room_id, id);
+                response.setStatus(status);
                 result->stringify(response.send());
             } else {
                 result->stringify(response.send());
@@ -191,7 +194,8 @@ inline std::vector<Route> routeTable{
                 auto paths = std::vector<std::string>{};
                 Poco::URI(request.getURI()).getPathSegments(paths);
                 int room_id = std::stoi(paths[1]);
-                result = DataFacade::deleteRoom(room_id, user_id);
+                auto[status, result] = DataFacade::deleteRoom(room_id, user_id);
+                response.setStatus(status);
                 result->stringify(response.send());
             } else {
                 result->stringify(response.send());
@@ -218,7 +222,8 @@ inline std::vector<Route> routeTable{
                     response.send();
                     return;
                 }
-                result = DataFacade::joinRoom(room_id, member_id);
+                auto[status, result] = DataFacade::joinRoom(room_id, member_id);
+                response.setStatus(status);
                 result->stringify(response.send());
             } else {
                 result->stringify(response.send());
@@ -230,8 +235,8 @@ inline std::vector<Route> routeTable{
     {
         {"DELETE", std::regex("^/chatrooms/(\\d+)/member$")},
         [](HTTPServerRequest& request, HTTPServerResponse& response) {
-            Poco::JSON::Object::Ptr result = new Poco::JSON::Object();
-            auto v = VerifyJwt(request, result);
+            Poco::JSON::Object::Ptr result_json = new Poco::JSON::Object();
+            auto v = VerifyJwt(request, result_json);
             if (v.has_value()) {
                 auto [id, string] = v.value();
                 auto paths = std::vector<std::string>{};
@@ -245,10 +250,11 @@ inline std::vector<Route> routeTable{
                     response.send();
                     return;
                 }
-                result = DataFacade::leaveRoom(room_id, member_id);
+                auto [status,result] = DataFacade::leaveRoom(room_id, member_id);
+                response.setStatus(status);
                 result->stringify(response.send());
             } else {
-                result->stringify(response.send());
+                result_json->stringify(response.send());
             }
         }
     },

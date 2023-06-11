@@ -102,6 +102,6 @@ using std::string;
 
 inline string g_JWT_secret;
 
-template<typename T>
-using HttpParam = std::tuple<HTTPStatus , T>;
+template<typename ...T>
+using HttpParam = std::tuple<HTTPStatus , T...>;
 using HttpParamJSON = HttpParam<Poco::JSON::Object::Ptr>;

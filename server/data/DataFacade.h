@@ -24,7 +24,7 @@ struct DataFacade {
         return Application::instance().getSubsystem<UserManager>().loginUser(username, user_id, password);
     }
 
-    static Poco::JSON::Object::Ptr getRoomList(int user_id) {
+    static HttpParamJSON getRoomList(int user_id) {
         return Application::instance().getSubsystem<RoomManager>().getRoomList(user_id);
     }
 
@@ -44,27 +44,27 @@ struct DataFacade {
         return id;
     }
 
-    static Poco::JSON::Object::Ptr createRoom(int owner_id, std::string room_name, std::string room_description) {
+    static HttpParamJSON createRoom(int owner_id, std::string room_name, std::string room_description) {
         return Application::instance().getSubsystem<RoomManager>().createRoom(owner_id, std::move(room_name), std::move(room_description));
     }
 
-    static Poco::JSON::Object::Ptr deleteRoom(int room_id,int user_id) {
+    static HttpParamJSON deleteRoom(int room_id,int user_id) {
         return Application::instance().getSubsystem<RoomManager>().deleteRoom(room_id,user_id);
     }
 
-    static Poco::JSON::Object::Ptr getRoomInfo(int room_id) {
+    static HttpParamJSON getRoomInfo(int room_id) {
         return Application::instance().getSubsystem<RoomManager>().getRoomInfo(room_id);
     }
 
-    static Poco::JSON::Object::Ptr getRoomMemberList(int room_id,int user_id) {
+    static HttpParamJSON getRoomMemberList(int room_id,int user_id) {
         return Application::instance().getSubsystem<RoomManager>().getRoomMemberList(room_id,user_id);
     }
 
-    static Poco::JSON::Object::Ptr joinRoom(int room_id,int user_id) {
+    static HttpParamJSON joinRoom(int room_id,int user_id) {
         return Application::instance().getSubsystem<RoomManager>().joinRoom(room_id,user_id);
     }
 
-    static Poco::JSON::Object::Ptr leaveRoom(int room_id,int user_id) {
+    static HttpParamJSON leaveRoom(int room_id,int user_id) {
         return Application::instance().getSubsystem<RoomManager>().leaveRoom(room_id,user_id);
     }
 

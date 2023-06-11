@@ -11,7 +11,7 @@
 | 正常 | SUCCESS | 0 |
 | 注册失败，昵称已存在 | REGISTRATION_NICKNAME_EXISTS | 101 |
 | 注册失败，邮件已存在 | REGISTRATION_EMAIL_EXISTS | 102 |
-| 注册失败，服务器错误 | REGISTRATION_SERVER_ERROR | 110 |
+| 注册失败，服务器错误 | USER_SERVER_ERROR | 110 |
 | 登录失败，ID不存在 | LOGIN_ID_NOT_EXIST | 121 |
 | 登录失败，用户名不存在 | LOGIN_USERNAME_NOT_EXIST | 122 |
 | 登录失败，邮件不存在 | LOGIN_EMAIL_NOT_EXIST | 123 |
