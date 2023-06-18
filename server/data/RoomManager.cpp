@@ -2,6 +2,7 @@
 // Created by lambert on 23-6-4.
 //
 
+#include <regex>
 #include "RoomManager.h"
 #include "ChatRoomDB/User.h"
 #include "DataFacade.h"
@@ -61,6 +62,16 @@ HttpParamJSON RoomManager::getRoomList(int user_id) {
     return {HTTPStatus::HTTP_OK, result};
 }
 HttpParamJSON RoomManager::createRoom(int owner_id, std::string room_name, std::string room_description) {
+    {
+        std::regex roomname_regex("^[a-zA-Z0-9_]{6,30}$");
+        std::smatch match_result;
+        if (!std::regex_match(room_name, match_result, roomname_regex)) {
+            Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
+            result->set("code", static_cast<int>(state_code::CHATROOM_NAME_INVALID));
+            result->set("msg", "房间名格式不正确");
+            return {HTTPStatus::HTTP_BAD_REQUEST, result};
+        }
+    }
     Poco::JSON::Object::Ptr result = new Poco::JSON::Object;
 
     if (room_name.empty() || room_description.empty()) {

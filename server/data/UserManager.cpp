@@ -2,6 +2,7 @@
 // Created by lambert on 23-6-3.
 //
 
+#include <regex>
 #include "UserManager.h"
 #include "ChatRoomDB/User.h"
 #include "state_code.h"
@@ -38,6 +39,17 @@ HttpParamJSON UserManager::registerUser
     engine.update(password + salt);
     std::string hashed_password = Poco::DigestEngine::digestToHex(engine.digest());
     try {
+        //check username valid with regex
+        {
+            std::regex username_regex("^[a-zA-Z0-9_]{6,20}$");
+            if (!std::regex_match(username, username_regex)) {
+                poco_information(Application::instance().logger(), "Username invalid");
+                respond_json->set("code", static_cast<int>(state_code::REGISTRATION_NICKNAME_INVALID));
+                respond_json->set("msg", "用户名不合法");
+                return {HTTPStatus::HTTP_BAD_REQUEST, respond_json};
+            }
+        }
+
         auto session = DataFacade::getSession();
 
         Poco::ActiveRecord::Context::Ptr p_context = new Poco::ActiveRecord::Context(session);
